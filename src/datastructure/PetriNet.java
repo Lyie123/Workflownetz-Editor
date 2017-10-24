@@ -4,21 +4,18 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * Model eines abstrakten Worflownetzwerks
- */
-public class WorkflowNet{
+public class PetriNet {
 
     //region Knotenoperationen
     /**
-     * @param n Fügt den Knoten n dem Workflownetz hinzu. Falls Knoten n bereits Teil des Workflownetzes ist,
+     * @param n Fügt den Knoten n dem Netz hinzu. Falls Knoten n bereits Teil des Netzes ist,
      *          wird der alte Knoten überschrieben.
      */
     public void addNode(Node n) {
         _nodeSet.put(n.getId(), n);
     }
     /**
-     * @param id Gibt die id des Knotens an, der aus dem Workflownetz gelöscht werden soll. Es werden außerdem alle
+     * @param id Gibt die id des Knotens an, der aus dem Netz gelöscht werden soll. Es werden außerdem alle
      *           eingehenden Kanten gelöscht
      * @throws IllegalArgumentException wird geworfen wenn zu löschende Knoten nicht Teil des Workflownetzes ist.
      */
@@ -43,12 +40,12 @@ public class WorkflowNet{
 
     /**
      * @param id Die Id des Knoten der zurückgegeben werden soll.
-     * @return Gibt den Knoten mit der Id id zurück, falls er Teil des Workflownetzes ist.
-     * @throws IllegalArgumentException wird geworfen falls der Knoten mit der Id id kein Teil des Workflownetzes ist.
+     * @return Gibt den Knoten mit der Id id zurück, falls er Teil des Netzes ist.
+     * @throws IllegalArgumentException wird geworfen falls der Knoten mit der Id id kein Teil des Netzes ist.
      */
     public Node getNode(int id) throws IllegalArgumentException {
         if(containNode(id)) return _nodeSet.get(id);
-        else throw new IllegalArgumentException("Der Knoten mit der id " + id + " ist nicht Teil des Workflownetzes.");
+        else throw new IllegalArgumentException("Der Knoten mit der id " + id + " ist nicht Teil des Netzes.");
     }
     //endregion
 
@@ -76,7 +73,7 @@ public class WorkflowNet{
 
     //region Getter
     /**
-     * @return gibt die Anzahl der Knoten im Workflownetz zurück
+     * @return gibt die Anzahl der Knoten im Netz zurück
      */
     public int getSize(){
         return _nodeSet.size();
@@ -100,13 +97,11 @@ public class WorkflowNet{
     private HashMap<Integer, Node> _nodeSet = new HashMap<>();
 
 
-    static abstract class Node<T extends Node>{
+    static abstract class Node<T extends Node> extends NetElement{
         public Node(String label){
-            _id = _counterId++;
             _label = label;
             _adjList = new ArrayList<>();
         }
-
 
         /**
          * Lösche ausgehende Kante von diesen Knoten zu Knoten n
@@ -141,21 +136,13 @@ public class WorkflowNet{
                         " sind bereits verbunden");
             }
             else {
-                _adjList.add(n);
+                _adjList.add(new Edge(this, n));
             }
         }
-
-
-
 
         //region Getter/Setter
         public String getLabel() { return _label; }
         public void setLabel(String label) { _label = label; }
-
-        /**
-         * @return gibt die ID des Node Objekts zurück. Diese ID ist einzigartig.
-         */
-        public int getId() { return _id; }
         //endregion
 
         /**
@@ -174,9 +161,16 @@ public class WorkflowNet{
          * Der Knoten ist mit den Knoten in der Liste über eine gerichtete Kante verbunden.
          * Wobei der Knoten der Quellknoten und die Knoten in der Adjazenliste die Zielknoten darstellen.
          */
-        private ArrayList<T> _adjList;
+        private ArrayList<Edge> _adjList;
         private String _label;
-        private final int _id ;
-        private static int _counterId;
     }
+    static class Edge extends NetElement {
+        Edge(PetriNet.Node source, PetriNet.Node destination){
+            _source = source;
+            _destination = destination;
+        }
+        private PetriNet.Node _source;
+        private PetriNet.Node _destination;
+    }
+
 }

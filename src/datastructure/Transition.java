@@ -1,6 +1,6 @@
 package datastructure;
 
-public class Transition extends WorkflowNet.Node<Place>{
+public class Transition extends PetriNet.Node<Place>{
     public Transition(String label) {
         super(label);
     }

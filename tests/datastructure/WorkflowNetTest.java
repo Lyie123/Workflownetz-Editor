@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 class WorkflowNetTest {
     @Test
     void addNode() {
-        WorkflowNet w = new WorkflowNet();
+        PetriNet w = new PetriNet();
         Transition t = new Transition("t1");
         Place p = new Place("p1");
         Assertions.assertEquals(w.containNode(t), false);
@@ -35,7 +35,7 @@ class WorkflowNetTest {
 
     @Test
     void getNodeCount(){
-        WorkflowNet w = new WorkflowNet();
+        PetriNet w = new PetriNet();
         Assertions.assertEquals(w.getSize(), 0);
         w.addNode(new Transition("t1"));
         Assertions.assertEquals(w.getSize(), 1);
