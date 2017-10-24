@@ -4,8 +4,10 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Model eines abstrakten Worflownetzwerks
+ */
 public class WorkflowNet{
-
 
     //region Knotenoperationen
     /**
@@ -51,6 +53,11 @@ public class WorkflowNet{
     //endregion
 
     //region Kantenopeartionen
+    /**
+     * Verbindet die Knoten mit der Id von srcId nach destId mit einer gerichteten Kante
+     * @param srcId Knoten 1
+     * @param destId Knoten 2
+     */
     public void connectNodes(int srcId, int destId) {
         //Prüfe ob die Knoten die verbunden werden sollen, überhaupt Teil des Workflownetzes sind
         if(containNode(srcId) && containNode(destId)){
@@ -67,6 +74,16 @@ public class WorkflowNet{
     }
     //endregion
 
+    //region Getter
+    /**
+     * @return gibt die Anzahl der Knoten im Workflownetz zurück
+     */
+    public int getSize(){
+        return _nodeSet.size();
+    }
+    //endregion
+
+    //region Private Methoden
     /**
      * @param id Knoten, zu den alle eingehenden Kanten gefunden werden sollen.
      * @return Gibt alle Knoten die ausgehende Kanten zum Knoten id besitzen.
@@ -74,10 +91,11 @@ public class WorkflowNet{
     private ArrayList<Node> getIncomingEdgesOfNode(int id){
         ArrayList<Node> buffer = new ArrayList<>();
         for(Node n : _nodeSet.values()){
-            if(n.getAdjacencyList().contains(id)) buffer.add(n);
+            if(n._adjList.contains(id)) buffer.add(n);
         }
         return buffer;
     }
+    //endregion
 
     private HashMap<Integer, Node> _nodeSet = new HashMap<>();
 
@@ -96,12 +114,12 @@ public class WorkflowNet{
          * @throws IllegalArgumentException wird geworfen falls keine ausgehende Kante zu Knoten n existiert.
          */
         public void DeleteEdgeTo(T n) throws IllegalArgumentException{
-            if(!(_adjList.contains(n))){
-                throw new IllegalArgumentException("Verbindung von Knoten " + this.getId() + "zu Knoten " +
-                        n.getId() + " kann nicht gelöscht werden, da keine Verbindung zwischen den beiden Knoten existiert.");
+            if(_adjList.contains(n)){
+                _adjList.remove(n);
             }
             else{
-                _adjList.remove(n);
+                throw new IllegalArgumentException("Verbindung von Knoten " + this.getId() + "zu Knoten " +
+                        n.getId() + " kann nicht gelöscht werden, da keine Verbindung zwischen den beiden Knoten existiert.");
             }
         }
 
@@ -112,7 +130,7 @@ public class WorkflowNet{
          * oder wenn ein Platz mit einen Platz bzw Stelle mit Stelle verbunden werden soll.
          */
         private void connectNodeTo(T n) throws IllegalArgumentException{
-            //Prüfe ob der Knoten bereits vorhanden ist oder ob die beiden Knoten vom selben Subtype von Node sind.
+            //Prüfe ob der Knoten n bereits Teil der Adjazenliste ist und ob die beiden Knoten vom selben Subtype von Node sind.
             if(equalTypeOfNodes(this, n)) {
                 throw new IllegalArgumentException("Knoten mit id " + this.getId() + "und " + n.getId() +
                         "können nicht miteinander verbunden werden. Verbindungen zwischen " +
@@ -122,15 +140,23 @@ public class WorkflowNet{
                 throw new IllegalArgumentException("Knoten mit id" + this.getId() + " und " + n.getId() +
                         " sind bereits verbunden");
             }
-            _adjList.add(n);
+            else {
+                _adjList.add(n);
+            }
         }
+
+
+
+
+        //region Getter/Setter
+        public String getLabel() { return _label; }
+        public void setLabel(String label) { _label = label; }
+
         /**
          * @return gibt die ID des Node Objekts zurück. Diese ID ist einzigartig.
          */
         public int getId() { return _id; }
-        public ArrayList<T> getAdjacencyList() { return _adjList; }
-        public String getLabel() { return _label; }
-        public void setLabel(String label) { _label = label; }
+        //endregion
 
         /**
          * @param n1 Knoten 1
@@ -142,6 +168,12 @@ public class WorkflowNet{
             return (n1 instanceof Transition && n2 instanceof Transition) || (n1 instanceof Place && n2 instanceof Place);
         }
 
+
+        /**
+         * Stellt eine Adjazenliste dar.
+         * Der Knoten ist mit den Knoten in der Liste über eine gerichtete Kante verbunden.
+         * Wobei der Knoten der Quellknoten und die Knoten in der Adjazenliste die Zielknoten darstellen.
+         */
         private ArrayList<T> _adjList;
         private String _label;
         private final int _id ;
