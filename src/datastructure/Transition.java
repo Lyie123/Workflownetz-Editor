@@ -1,6 +1,6 @@
 package datastructure;
 
-public class Transition extends PetriNet.Node<Place>{
+public class Transition extends PetriNet.Node{
     public Transition(String label) {
         super(label);
     }

@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PetriNet {
+    public PetriNet(){
+        _nodeSet = new HashMap<>();
+
+    }
 
     //region Knotenoperationen
     /**
@@ -18,26 +22,42 @@ public class PetriNet {
      * @param id Gibt die id des Knotens an, der aus dem Netz gelöscht werden soll. Es werden außerdem alle
      *           eingehenden Kanten gelöscht
      * @throws IllegalArgumentException wird geworfen wenn zu löschende Knoten nicht Teil des Workflownetzes ist.
+     * todo noch zu implementieren.
      */
     public void deleteNode(int id) throws IllegalArgumentException {
         if(containNode(id)){
-            for(Node n : getIncomingEdgesOfNode(id)){
-                n.DeleteEdgeTo(getNode(id));
-            }
+            Node n = this.getNode(id);
+
+            //Schritt 1: Lösche alle ausgehenden Kanten des Knotens
+            deleteAllOutgoingEdges(n);
+
+            //Schritt 2: Lösche alle eingehenden Kanten des Knotens
+            deleteAllIncomingEdges(n);
+
+            //Schritt 3: Lösche den Knoten selbst
+            _nodeSet.remove(id);
         }
         else{
             throw new IllegalArgumentException("Knoten konnte nicht gelöscht werden. " +
                     "Der zu löschende Knoten mit id " + id + " ist nicht Teil des Workflownetzes.");
         }
     }
-
+    /**
+     * @param n Überprüft ob der Knoten n Teil des Netzes ist.
+     * @return true wenn der Knoten n Teil des Netzes ist
+     *         sonst false.
+     */
     public boolean containNode(Node n) {
         return containNode(n.getId());
     }
+    /**
+     * @param id Überprüft ob ein Knoten mit der Id id Teil des Netzes ist.
+     * @return true wenn ein Knoten mit der Id id Teil des Netzes ist,
+     *         sonst false.
+     */
     public boolean containNode(int id){
         return _nodeSet.containsKey(id);
     }
-
     /**
      * @param id Die Id des Knoten der zurückgegeben werden soll.
      * @return Gibt den Knoten mit der Id id zurück, falls er Teil des Netzes ist.
@@ -66,6 +86,10 @@ public class PetriNet {
                     " konnten nicht verbunden werden da mindestens ein Knoten nicht teil des Workflownetzes ist.");
         }
     }
+    /**Verbindet den Knoten src mit dest mit einer gerichteten Kante.
+     * @param src Quellknoten der mit dem Knoten dest verbunden werden soll.
+     * @param dest Zielknoten der mit dem Knoten src verbunden werden soll.
+     */
     public void connectNodes(Node src, Node dest){
         connectNodes(src.getId(), dest.getId());
     }
@@ -85,38 +109,73 @@ public class PetriNet {
      * @param id Knoten, zu den alle eingehenden Kanten gefunden werden sollen.
      * @return Gibt alle Knoten die ausgehende Kanten zum Knoten id besitzen.
      */
-    private ArrayList<Node> getIncomingEdgesOfNode(int id){
+    private ArrayList<Node> getIncomingEdgesOfNode(Node n){
         ArrayList<Node> buffer = new ArrayList<>();
-        for(Node n : _nodeSet.values()){
-            if(n._adjList.contains(id)) buffer.add(n);
+        for(Node node : _nodeSet.values()){
+            //todo noch zu implementieren. löschen funkt noch nicht.
+            ArrayList<Edge> b = n.getOutgoingEdges();
+
         }
         return buffer;
     }
+    /**Löscht alle eingehende Kanten des Knotens n
+     * @param n Knoten n
+     */
+    private void deleteAllIncomingEdges(Node n){
+        for(Node src : getIncomingEdgesOfNode(n)){
+            src.deleteEdgeTo(n);
+        }
+    }
+    /**Löscht alle ausgehenden Kanten des Knotens n
+     * @param n Knoten n
+     */
+    private void deleteAllOutgoingEdges(Node n){
+        n.deleteAllOutgoingEdges();
+    }
     //endregion
 
-    private HashMap<Integer, Node> _nodeSet = new HashMap<>();
+    @Override
+    public String toString(){
+        String buffer = "";
+        for(Node n : _nodeSet.values()){
+            buffer+= n.getLabel() + " -> " + n.toString() + "\n";
+        }
+        return buffer;
+    }
+
+    /**
+     * Enthält alle Knoten die Teil des Netzes sind.
+     * Der Schlüsselwert der Hashmap ist die eindeutige Id der Netzelemente.
+     */
+    private HashMap<Integer, Node> _nodeSet;
 
 
-    static abstract class Node<T extends Node> extends NetElement{
+
+
+
+
+
+
+
+
+    static abstract class Node extends NetElement{
         public Node(String label){
             _label = label;
-            _adjList = new ArrayList<>();
         }
 
-        /**
-         * Lösche ausgehende Kante von diesen Knoten zu Knoten n
-         * @param n
-         * @throws IllegalArgumentException wird geworfen falls keine ausgehende Kante zu Knoten n existiert.
-         */
-        public void DeleteEdgeTo(T n) throws IllegalArgumentException{
-            if(_adjList.contains(n)){
-                _adjList.remove(n);
+        @Override
+        public String toString(){
+            String buffer = "";
+            for(Edge e : _adjList){
+                buffer += e.toString() + ", ";
             }
-            else{
-                throw new IllegalArgumentException("Verbindung von Knoten " + this.getId() + "zu Knoten " +
-                        n.getId() + " kann nicht gelöscht werden, da keine Verbindung zwischen den beiden Knoten existiert.");
-            }
+            return buffer;
         }
+
+        //region Getter/Setter
+        public String getLabel() { return _label; }
+        public void setLabel(String label) { _label = label; }
+        //endregion
 
         /**
          * Verbindet eine Stelle mit einem Platz oder einen Platz mit einer Stelle
@@ -124,7 +183,7 @@ public class PetriNet {
          * @throws IllegalArgumentException wird geworfen wenn dieser Knoten bereits mit Knoten n verbunden ist,
          * oder wenn ein Platz mit einen Platz bzw Stelle mit Stelle verbunden werden soll.
          */
-        private void connectNodeTo(T n) throws IllegalArgumentException{
+        private void connectNodeTo(Node n) throws IllegalArgumentException{
             //Prüfe ob der Knoten n bereits Teil der Adjazenliste ist und ob die beiden Knoten vom selben Subtype von Node sind.
             if(equalTypeOfNodes(this, n)) {
                 throw new IllegalArgumentException("Knoten mit id " + this.getId() + "und " + n.getId() +
@@ -139,12 +198,20 @@ public class PetriNet {
                 _adjList.add(new Edge(this, n));
             }
         }
-
-        //region Getter/Setter
-        public String getLabel() { return _label; }
-        public void setLabel(String label) { _label = label; }
-        //endregion
-
+        /**
+         * Lösche ausgehende Kante von diesen Knoten zu Knoten n
+         * @param n
+         * @throws IllegalArgumentException wird geworfen falls keine ausgehende Kante zu Knoten n existiert.
+         */
+        private void deleteEdgeTo(Node n) throws IllegalArgumentException{
+            if(_adjList.contains(n)){
+                _adjList.remove(n);
+            }
+            else{
+                throw new IllegalArgumentException("Verbindung von Knoten " + this.getId() + "zu Knoten " +
+                        n.getId() + " kann nicht gelöscht werden, da keine Verbindung zwischen den beiden Knoten existiert.");
+            }
+        }
         /**
          * @param n1 Knoten 1
          * @param n2 Knoten 2
@@ -154,23 +221,45 @@ public class PetriNet {
         private boolean equalTypeOfNodes(Node n1, Node n2){
             return (n1 instanceof Transition && n2 instanceof Transition) || (n1 instanceof Place && n2 instanceof Place);
         }
-
+        private void deleteAllOutgoingEdges(){
+            _adjList.clear();
+        }
+        private ArrayList<Edge> getOutgoingEdges() { return _adjList; }
 
         /**
          * Stellt eine Adjazenliste dar.
          * Der Knoten ist mit den Knoten in der Liste über eine gerichtete Kante verbunden.
          * Wobei der Knoten der Quellknoten und die Knoten in der Adjazenliste die Zielknoten darstellen.
          */
-        private ArrayList<Edge> _adjList;
+        private ArrayList<Edge> _adjList = new ArrayList<>();
         private String _label;
     }
+
+
+
+
+
+
+
+
     static class Edge extends NetElement {
-        Edge(PetriNet.Node source, PetriNet.Node destination){
+        Edge(PetriNet.Node source,PetriNet.Node destination){
             _source = source;
             _destination = destination;
         }
-        private PetriNet.Node _source;
+
+        public Node getDestination() {
+            return _destination;
+        }
+        public Node getSource() { return _source; }
+
+        @Override
+        public String toString(){
+            return String.valueOf(getDestination().getLabel());
+        }
+
         private PetriNet.Node _destination;
+        private PetriNet.Node _source;
     }
 
 }
