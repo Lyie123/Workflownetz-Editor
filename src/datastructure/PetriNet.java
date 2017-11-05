@@ -218,7 +218,7 @@ public class PetriNet {
          * @return Gibt true zurück wenn n1 und n2 den selben Subtype von Node besitzen,
          *         sonst false
          */
-        private boolean equalTypeOfNodes(Node n1, Node n2){
+        private static boolean equalTypeOfNodes(Node n1, Node n2){
             return (n1 instanceof Transition && n2 instanceof Transition) || (n1 instanceof Place && n2 instanceof Place);
         }
         private void deleteAllOutgoingEdges(){
@@ -235,31 +235,5 @@ public class PetriNet {
         private String _label;
     }
 
-
-
-
-
-
-
-
-    static class Edge extends NetElement {
-        Edge(PetriNet.Node source,PetriNet.Node destination){
-            _source = source;
-            _destination = destination;
-        }
-
-        public Node getDestination() {
-            return _destination;
-        }
-        public Node getSource() { return _source; }
-
-        @Override
-        public String toString(){
-            return String.valueOf(getDestination().getLabel());
-        }
-
-        private PetriNet.Node _destination;
-        private PetriNet.Node _source;
-    }
 
 }
