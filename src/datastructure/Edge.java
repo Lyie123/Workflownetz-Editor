@@ -1,21 +1,23 @@
 package datastructure;
 
 public class Edge extends NetElement {
-    Edge(PetriNet.Node source, PetriNet.Node destination){
+    Edge(WorkflowNet.Node source, WorkflowNet.Node destination){
         _source = source;
         _destination = destination;
     }
-
-    public PetriNet.Node getDestination() {
+    public WorkflowNet.Node getDestination() {
         return _destination;
     }
-    public PetriNet.Node getSource() { return _source; }
+    public WorkflowNet.Node getSource() { return _source; }
+
+    void setDestionation(WorkflowNet.Node dest) { _destination = dest; }
+    void setSource(WorkflowNet.Node src) { _source = src; }
 
     @Override
     public String toString(){
         return String.valueOf(getDestination().getLabel());
     }
 
-    private PetriNet.Node _destination;
-    private PetriNet.Node _source;
+    private WorkflowNet.Node _destination;
+    private WorkflowNet.Node _source;
 }

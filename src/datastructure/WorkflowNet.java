@@ -4,8 +4,8 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PetriNet {
-    public PetriNet(){
+public class WorkflowNet {
+    public WorkflowNet(){
         _nodeSet = new HashMap<>();
 
     }
@@ -102,6 +102,14 @@ public class PetriNet {
     public int getSize(){
         return _nodeSet.size();
     }
+    public ArrayList<Node> getNodes(){ return new ArrayList<>(_nodeSet.values()); }
+    public ArrayList<Edge> getEdges(){
+        ArrayList<Edge> buffer = new ArrayList<>();
+        for(Node n : _nodeSet.values()){
+            buffer.addAll(n._adjList);
+        }
+        return buffer;
+    }
     //endregion
 
     //region Private Methoden
@@ -158,8 +166,9 @@ public class PetriNet {
 
 
 
-    static abstract class Node extends NetElement{
-        public Node(String label){
+    public static abstract class Node extends NetElementWithPosition{
+        public Node(String label, int x, int y) {
+            super(x, y);
             _label = label;
         }
 
