@@ -4,11 +4,7 @@ import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.canvas.Canvas;
-import datastructure.*;
-import javafx.scene.paint.Color;
-import javafx.scene.transform.*;
-
-import java.util.ArrayList;
+import workflownet.WorkflowNet;
 
 public class Controller {
     @FXML
@@ -17,7 +13,7 @@ public class Controller {
 
     @FXML
     private void initialize() {
-        workflow = new WorkflowNet();
+        /*workflow = new WorkflowNet();
         workflow.addNode(new Transition("t1", 30, 30));
         workflow.addNode(new Place("p1", 100, 100));
         workflow.addNode(new Transition("t2", 200, 100));
@@ -25,7 +21,7 @@ public class Controller {
         workflow.connectNodes(0, 1);
         workflow.connectNodes(1, 2);
         workflow.connectNodes(2, 3);
-        workflow.connectNodes(3, 0);
+        workflow.connectNodes(3, 0);*/
 
 
         GraphicsContext gc =  myCanvas.getGraphicsContext2D();
@@ -36,7 +32,7 @@ public class Controller {
     }
     @FXML
     private void drawCanvas(ActionEvent event) {
-        GraphicsContext gc =  myCanvas.getGraphicsContext2D();
+        /*GraphicsContext gc =  myCanvas.getGraphicsContext2D();
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(1);
 
@@ -53,9 +49,9 @@ public class Controller {
         for(Edge e : workflow.getEdges()){
             drawEdge(gc, e);
         }
-
+*/
     }
-
+/*
     private void drawTransistion(GraphicsContext gc, Transition t){
         gc.strokeRect(t.getPosition().getX() - 20, t.getPosition().getY() - 20, 40, 40);
     }
@@ -83,5 +79,5 @@ public class Controller {
         gc.fillPolygon(new double[]{len, len - arrSize, len - arrSize, len}, new double[]{0, -arrSize, arrSize, 0},
                 4);
 
-    }
+    }*/
 }

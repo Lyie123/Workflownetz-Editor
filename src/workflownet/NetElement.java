@@ -1,12 +1,13 @@
-package datastructure;
+package workflownet;
 
 /**
  * Stellt ein Netzelement eines Petrinetzes dar.
  * Organisiert die Vergabe einer einzigartigen ID an die Netzelemente.
  */
-abstract class NetElement {
-    public NetElement(){
+abstract class NetElement implements INetELement{
+    public NetElement(NetElementType type){
         _id = _idCounter++;
+        _type = type;
     }
 
     /**
@@ -14,12 +15,13 @@ abstract class NetElement {
      */
     private static int _idCounter = 0;
 
-
-
     /**
      * Persönliche Id des Netzelements.
      */
     private final int _id;
+    private final NetElementType _type;
     public int getId() { return _id; }
-
+    public NetElementType getType() {
+        return _type;
+    }
 }

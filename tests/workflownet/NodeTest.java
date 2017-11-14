@@ -1,12 +1,12 @@
-package datastructure;
+package workflownet;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class NodeTest {
     @Test
     void deleteEdgeTo() {
+        VisualWorkflowNet v = new VisualWorkflowNet();
+
     }
 
     @Test
