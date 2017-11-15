@@ -37,8 +37,9 @@ public abstract class Node extends NetElement implements INode{
                     "können nicht miteinander verbunden werden. Verbindungen zwischen " +
                     "Transistion -> Transition und Place -> Place sind nicht erlaubt.");
         }
-        else if(_outgoingEdges.contains(n)){
-            throw new IllegalArgumentException("Knoten mit id" + this.getId() + " und " + n.getId() +
+
+        else if(isNodeConnectedWith(n)){
+            throw new IllegalArgumentException("Knoten mit id " + this.getId() + " und " + n.getId() +
                     " sind bereits verbunden");
         }
         else {
@@ -65,7 +66,7 @@ public abstract class Node extends NetElement implements INode{
      *         sonst false
      */
     private static boolean equalTypeOfNodes(Node n1, Node n2){
-        return (n1 instanceof Transition && n2 instanceof Transition) || (n1 instanceof Place && n2 instanceof Place);
+        return n1.getType() == n2.getType();
     }
 
     void deleteAllOutgoingEdges(){
@@ -77,6 +78,12 @@ public abstract class Node extends NetElement implements INode{
 
     private void deleteIncomingEdgeFrom(Node source) {
         _incomingNodes.remove(source);
+    }
+    private boolean isNodeConnectedWith(Node n){
+        for (Edge e : _outgoingEdges){
+            if(e.getDestination() == n) return true;
+        }
+        return false;
     }
 
     void deleteAllIncomingEgeds() {
@@ -93,7 +100,7 @@ public abstract class Node extends NetElement implements INode{
      * Der Knoten ist mit den Knoten in der Liste über eine gerichtete Kante verbunden.
      * Wobei der Knoten der Quellknoten und die Knoten in der Adjazenliste die Zielknoten darstellen.
      */
-    private ArrayList<Edge> _outgoingEdges;
-    private ArrayList<Node> _incomingNodes;
+    protected ArrayList<Edge> _outgoingEdges;
+    protected ArrayList<Node> _incomingNodes;
     private String _label;
 }

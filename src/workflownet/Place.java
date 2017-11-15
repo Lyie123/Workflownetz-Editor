@@ -5,5 +5,5 @@ public class Place extends Node {
         super(label, NetElementType.Place);
     }
 
-    public void ichbinplace(){}
+    public void ichbinplace(){ }
 }

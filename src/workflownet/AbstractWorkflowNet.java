@@ -24,7 +24,7 @@ public abstract class AbstractWorkflowNet<T extends INode> implements IWorkflowN
      */
     public void deleteNode(int id) throws IllegalArgumentException {
         if(containNode(id)){
-            T n = this.getNode(id);
+            Node n = (Node)this.getNode(id);
 
             //Schritt 1: Lösche alle ausgehenden Kanten des Knotens
             deleteAllOutgoingEdgesOfNode(n);
@@ -98,11 +98,11 @@ public abstract class AbstractWorkflowNet<T extends INode> implements IWorkflowN
     /**Löscht alle eingehende Kanten des Knotens n
      * @param n Knoten n
      */
-    protected abstract void deleteAllIncomingEdgesOfNode(T n);
+    protected abstract void deleteAllIncomingEdgesOfNode(Node n);
     /**Löscht alle ausgehenden Kanten des Knotens n
      * @param n Knoten n
      */
-    protected abstract void deleteAllOutgoingEdgesOfNode(T n);
+    protected abstract void deleteAllOutgoingEdgesOfNode(Node n);
 
     @Override
     public String toString(){

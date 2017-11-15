@@ -4,37 +4,37 @@ import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.canvas.Canvas;
-import workflownet.WorkflowNet;
+import workflownet.*;
+import javafx.scene.paint.Color;
 
 public class Controller {
     @FXML
     private Canvas myCanvas;
-    private WorkflowNet workflow;
+    private VisualWorkflowNet workflow;
 
     @FXML
     private void initialize() {
-        /*workflow = new WorkflowNet();
-        workflow.addNode(new Transition("t1", 30, 30));
-        workflow.addNode(new Place("p1", 100, 100));
-        workflow.addNode(new Transition("t2", 200, 100));
-        workflow.addNode(new Place("p2", 400, 50));
+        workflow = new VisualWorkflowNet();
+        workflow.addNode(new VisualTransistion("t1", 90, 200));
+        workflow.addNode(new VisualPlace("p1", 500, 210));
+        workflow.addNode(new VisualTransistion("t2", 300, 100));
+        workflow.addNode(new VisualPlace("p2", 80, 500));
         workflow.connectNodes(0, 1);
         workflow.connectNodes(1, 2);
         workflow.connectNodes(2, 3);
-        workflow.connectNodes(3, 0);*/
+        workflow.connectNodes(3, 0);
 
 
         GraphicsContext gc =  myCanvas.getGraphicsContext2D();
-
-        //gc.setFill(Color.GREEN);
-        //gc.fillRect(0, 0, myCanvas.getWidth(), myCanvas.getHeight());
-
     }
     @FXML
     private void drawCanvas(ActionEvent event) {
-        /*GraphicsContext gc =  myCanvas.getGraphicsContext2D();
+        GraphicsContext gc = myCanvas.getGraphicsContext2D();
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(1);
+        workflow.draw(gc);
+        /*GraphicsContext gc =  myCanvas.getGraphicsContext2D();
+
 
         ArrayList<WorkflowNet.Node> n = workflow.getNodes();
         for (WorkflowNet.Node i : n) {

@@ -1,6 +1,6 @@
 package workflownet;
 
-class Edge extends NetElement {
+class Edge extends NetElement{
     Edge(Node source, Node destination){
         super(NetElementType.Edge);
         _source = source;
