@@ -1,33 +1,33 @@
 package workflownet;
 
+import javafx.geometry.Point2D;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.transform.Transform;
-import javafx.scene.transform.Affine;
-import javafx.geometry.Point2D;
+import javafx.scene.text.Font;
 
 public interface VisualNode extends INode, IDrawable {
     Visual getVisual();
-    static void drawEdges(GraphicsContext gc, VisualNode n1, VisualNode n2){
-        int arrSize = 6;
+    boolean nodeContainsPoint(Point2D point);
 
+    void drawEdges(GraphicsContext gc);
+    void drawEdge(GraphicsContext gc, VisualNode n1, VisualNode n2);
+    default void drawLabel(GraphicsContext gc){
+        gc.setLineWidth(FontLineSize);
+        gc.setFont(new Font("Verdana", FontSize));
         gc.setFill(Color.BLACK);
+        gc.fillText(getLabel(), getVisual().getPoint().getX() - VisualTransition.Width/2,
+                getVisual().getPoint().getY() + VisualTransition.Height/2 + FontSize);
+    }
+    void drawNode(GraphicsContext gc);
 
-        Point2D p1 = n1.getVisual().getPoint();
-        Point2D p2 = n2.getVisual().getPoint();
+    double FontLineSize = 1;
+    double FontSize = 14;
 
-        double dx = p2.getX() - p1.getX(), dy = p2.getY() - p1.getY();
-        double angle = Math.atan2(dy, dx);
-        double len =  Math.sqrt(dx * dx + dy * dy);
-
-        Transform transform = Transform.translate(p1.getX(), p1.getY());
-        transform = transform.createConcatenation(Transform.rotate(Math.toDegrees(angle), 0, 0));
-        gc.setTransform(new Affine(transform));
-
-        gc.strokeLine(0, 0, len, 0);
-        gc.fillPolygon(new double[]{len, len - arrSize, len - arrSize, len}, new double[]{0, -arrSize, arrSize, 0},
-                4);
-
-        gc.setTransform(new Affine());
+    @Override
+    default void draw(Canvas canvas) {
+        drawNode(canvas.getGraphicsContext2D());
+        drawEdges(canvas.getGraphicsContext2D());
+        drawLabel(canvas.getGraphicsContext2D());
     }
 }

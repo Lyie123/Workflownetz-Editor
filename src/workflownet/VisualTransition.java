@@ -7,8 +7,8 @@ import javafx.scene.text.Font;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 
-public class VisualPlace extends Place implements VisualNode {
-    public VisualPlace(String label, double x, double y) {
+public class VisualTransition extends Transition implements VisualNode {
+    public VisualTransition(String label, double x, double y) {
         super(label);
         _visual = new Visual(x, y);
     }
@@ -20,8 +20,8 @@ public class VisualPlace extends Place implements VisualNode {
 
     @Override
     public boolean nodeContainsPoint(Point2D point) {
-        //(x - center_x)^2 + (y - center_y)^2 < radius^2
-        return (Math.pow(point.getX() - _visual.getPoint().getX(), 2) + Math.pow(point.getY() - _visual.getPoint().getY(), 2) < Diameter/2);
+        return (_visual.getPoint().getX() <= point.getX() && point.getX() <= _visual.getPoint().getX() + Width &&
+                _visual.getPoint().getY() <= point.getY() && point.getY() <= _visual.getPoint().getY() + Height);
     }
 
     @Override
@@ -57,12 +57,12 @@ public class VisualPlace extends Place implements VisualNode {
     @Override
     public void drawNode(GraphicsContext gc) {
         gc.setLineWidth(LineSize);
-        gc.strokeOval(_visual.getPoint().getX() - Diameter/2, _visual.getPoint().getY() - Diameter/2,
-                Diameter, Diameter);
+        gc.strokeRect(_visual.getPoint().getX() - Width/2, _visual.getPoint().getY() - Height/2,
+                Width, Height);
     }
 
-    private Visual _visual;
-
-    public static double Diameter = 50;
+    public static double Height = 50;
+    public static double Width = 50;
     public static int LineSize = 1;
+    private Visual _visual;
 }

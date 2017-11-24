@@ -7,8 +7,8 @@ public class WorkflowNet extends AbstractWorkflowNet<Node>{
     /**
      * Verbindet die Knoten mit der Id von srcId nach destId mit einer gerichteten Kante
      *
-     * @param srcId  Knoten 1
-     * @param destId Knoten 2
+     * @param srcId  Quellknoten
+     * @param destId Zielknoten
      */
     @Override
     public void connectNodes(int srcId, int destId) {

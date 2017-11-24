@@ -1,7 +1,7 @@
 package workflownet;
 
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.canvas.Canvas;
 
 public interface IDrawable {
-    void draw(GraphicsContext gc);
+    void draw(Canvas canvas);
 }

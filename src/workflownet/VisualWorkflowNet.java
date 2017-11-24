@@ -1,7 +1,8 @@
 package workflownet;
 
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.canvas.Canvas;
 
+import javafx.geometry.Point2D;
 import java.security.InvalidParameterException;
 
 public class VisualWorkflowNet extends AbstractWorkflowNet<VisualNode> implements IDrawable{
@@ -19,34 +20,24 @@ public class VisualWorkflowNet extends AbstractWorkflowNet<VisualNode> implement
             ((Node)getNode(srcId)).connectNodeTo((Node)getNode(destId));
         }
         else{
-            throw new InvalidParameterException("Die Knoten: " + srcId + " und " + destId +
+            throw new InvalidParameterException("Die Knoten: " + srcId +  " und " + destId +
                     " konnten nicht verbunden werden da mindestens ein Knoten nicht teil des Workflownetzes ist.");
         }
     }
 
-    /**
-     * Löscht alle eingehende Kanten des Knotens n
-     *
-     * @param n Knoten n
-     */
-    @Override
-    protected void deleteAllIncomingEdgesOfNode(Node n) {
-        n.deleteAllIncomingEgeds();
-    }
-
-    /**
-     * Löscht alle ausgehenden Kanten des Knotens n
-     *
-     * @param n Knoten n
-     */
-    @Override
-    protected void deleteAllOutgoingEdgesOfNode(Node n) {
-        n.deleteAllOutgoingEdges();
+    public INetELement isNetElementClicked(Point2D point){
+        //todo zu implementieren
+        for(VisualNode v : _nodeSet.values()){
+            if(v.nodeContainsPoint(point)) return v;
+        }
+        return null;
     }
 
     @Override
-    public void draw(GraphicsContext gc) {
-       //todo noch zu implementieren
-        _nodeSet.values().forEach(n ->n.draw(gc));
+    public void draw(Canvas canvas) {
+        _nodeSet.values().forEach(n ->n.draw(canvas));
+    }
+    public void clear(Canvas canvas){
+        canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 }

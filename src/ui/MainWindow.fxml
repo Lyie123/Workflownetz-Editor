@@ -20,18 +20,18 @@
     <top>
         <ToolBar orientation="HORIZONTAL" prefHeight="75">
             <items>
-                <Button fx:id="button2" onAction="#drawCanvas">button2</Button>
-                <Button>button3</Button>
+                <Button fx:id="button2">button2</Button>
+                <Button fx:id="button3" onAction="#buttonOpenFile">Öffne Workflownetz</Button>
                 <Button>button4</Button>
             </items>
         </ToolBar>
     </top>
     <bottom>
-        <StackPane fx:id="statusNachricht" prefHeight="15">
-            <Text>213</Text>
+        <StackPane prefHeight="15">
+            <Text fx:id="statusMsg">213</Text>
         </StackPane>
     </bottom>
     <center>
-        <Canvas fx:id="myCanvas" height="940" width="1770" BorderPane.alignment="TOP_LEFT" />
+        <Canvas fx:id="myCanvas" height="940" onMouseClicked="#test" width="1770" BorderPane.alignment="TOP_LEFT" />
     </center>
 </BorderPane>

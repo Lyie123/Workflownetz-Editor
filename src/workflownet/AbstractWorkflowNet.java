@@ -13,8 +13,9 @@ public abstract class AbstractWorkflowNet<T extends INode> implements IWorkflowN
      * @param n Fügt den Knoten n dem Netz hinzu. Falls Knoten n bereits Teil des Netzes ist,
      *          wird der alte Knoten überschrieben.
      */
-    public void addNode(T n) {
+    public int addNode(T n) {
         _nodeSet.put(n.getId(), n);
+        return n.getId();
     }
     /**
      * @param id Gibt die id des Knotens an, der aus dem Netz gelöscht werden soll. Es werden außerdem alle
@@ -98,11 +99,15 @@ public abstract class AbstractWorkflowNet<T extends INode> implements IWorkflowN
     /**Löscht alle eingehende Kanten des Knotens n
      * @param n Knoten n
      */
-    protected abstract void deleteAllIncomingEdgesOfNode(Node n);
+    protected void deleteAllIncomingEdgesOfNode(Node n){
+        n.deleteAllIncomingEgeds();
+    }
     /**Löscht alle ausgehenden Kanten des Knotens n
      * @param n Knoten n
      */
-    protected abstract void deleteAllOutgoingEdgesOfNode(Node n);
+    protected void deleteAllOutgoingEdgesOfNode(Node n){
+        n.deleteAllOutgoingEdges();
+    }
 
     @Override
     public String toString(){

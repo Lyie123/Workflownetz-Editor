@@ -1,7 +1,7 @@
 package workflownet;
 
 public interface IWorkflowNet<T extends INode> {
-    void addNode(T n);
+    int addNode(T n);
     void deleteNode(int id);
     void deleteNode(T node);
     boolean containNode(int id);
