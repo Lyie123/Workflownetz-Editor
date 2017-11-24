@@ -1,20 +1,28 @@
 package workflownet;
 
-class Edge extends NetElement{
-    Edge(Node source, Node destination){
+import javafx.geometry.Point2D;
+import javafx.scene.canvas.Canvas;
+
+public class Edge extends NetElement {
+    public Edge(Node src, Node dest) {
         super(NetElementType.Edge);
-        _source = source;
-        _destination = destination;
+        _src = src;
+        _dest = dest;
     }
-    public Node getDestination() {
-        return _destination;
+
+    public Node getSource(){ return _src; }
+    public Node getDestination(){ return _dest; }
+
+    @Override
+    public void Draw(Canvas canvas) {
+
     }
-    public Node getSource() { return _source; }
 
-    void setDestionation(Node dest) { _destination = dest; }
-    void setSource(Node src) { _source = src; }
+    @Override
+    public boolean PointLiesOnNetElement(Point2D p) {
+        return false;
+    }
 
-
-    private Node _destination;
-    private Node _source;
+    private Node _dest;
+    private Node _src;
 }

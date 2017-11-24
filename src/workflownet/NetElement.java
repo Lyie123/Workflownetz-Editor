@@ -1,27 +1,24 @@
 package workflownet;
 
-/**
- * Stellt ein Netzelement eines Petrinetzes dar.
- * Organisiert die Vergabe einer einzigartigen ID an die Netzelemente.
- */
-abstract class NetElement implements INetELement{
+import javafx.geometry.Point2D;
+
+public abstract class NetElement implements IDrawable{
     public NetElement(NetElementType type){
-        _id = _idCounter++;
         _type = type;
+        _id = _counter++;
     }
 
-    /**
-     * Zählervariable für die Vergabe der nächsten freien Id.
-     */
-    private static int _idCounter = 0;
+    public static double StrokeThikness = 2;
 
-    /**
-     * Persönliche Id des Netzelements.
-     */
-    private final int _id;
-    private final NetElementType _type;
-    public int getId() { return _id; }
+    public int getId(){
+        return _id;
+    }
+    public abstract boolean PointLiesOnNetElement(Point2D p);
     public NetElementType getType() {
         return _type;
     }
+
+    private NetElementType _type;
+    private int _id;
+    private static int _counter = 0;
 }

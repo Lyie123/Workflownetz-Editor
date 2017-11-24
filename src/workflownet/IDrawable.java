@@ -3,5 +3,5 @@ package workflownet;
 import javafx.scene.canvas.Canvas;
 
 public interface IDrawable {
-    void draw(Canvas canvas);
+    void Draw(Canvas canvas);
 }

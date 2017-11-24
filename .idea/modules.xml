@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Workflownetz-Editor.iml" filepath="$PROJECT_DIR$/Workflownetz-Editor.iml" />
+      <module fileurl="file://$USER_HOME$/IdeaProjects/NewWorkflowEditor/src/workflownet/workflownet.iml" filepath="$USER_HOME$/IdeaProjects/NewWorkflowEditor/src/workflownet/workflownet.iml" />
     </modules>
   </component>
 </project>

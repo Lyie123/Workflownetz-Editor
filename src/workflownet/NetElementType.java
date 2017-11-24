@@ -1,5 +1,5 @@
 package workflownet;
 
 public enum NetElementType {
-    Edge, Transition, Place
+    Transition, Place, Edge
 }

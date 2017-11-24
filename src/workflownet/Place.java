@@ -1,15 +1,22 @@
 package workflownet;
 
-public class Place extends AbstractPlace<Edge> {
+import javafx.geometry.Point2D;
+import javafx.scene.canvas.Canvas;
+
+public class Place extends Node {
     public Place(String label) {
-        super(label);
+        super(NetElementType.Place, label);
     }
 
-    public void ichbinplace(){ }
+    public static double Diameter = 50;
 
     @Override
-    protected void addEdge(Node<Edge> src, Node<Edge> dest) {
-        _outgoingEdges.add(new Edge(src, dest));
-        _incomingNodes.add(src);
+    public void Draw(Canvas canvas) {
+
+    }
+
+    @Override
+    public boolean PointLiesOnNetElement(Point2D p) {
+        return false;
     }
 }
