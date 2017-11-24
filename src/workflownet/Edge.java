@@ -14,10 +14,6 @@ class Edge extends NetElement{
     void setDestionation(Node dest) { _destination = dest; }
     void setSource(Node src) { _source = src; }
 
-    @Override
-    public String toString(){
-        return String.valueOf(getDestination().getLabel());
-    }
 
     private Node _destination;
     private Node _source;

@@ -109,15 +109,6 @@ public abstract class AbstractWorkflowNet<T extends INode> implements IWorkflowN
         n.deleteAllOutgoingEdges();
     }
 
-    @Override
-    public String toString(){
-        String buffer = "";
-        for(T n : _nodeSet.values()){
-            buffer+= n.getLabel() + " -> " + n.toString() + "\n";
-        }
-        return buffer;
-    }
-
     /**
      * Enthält alle Knoten die Teil des Netzes sind.
      * Der Schlüsselwert der Hashmap ist die eindeutige Id der Netzelemente.

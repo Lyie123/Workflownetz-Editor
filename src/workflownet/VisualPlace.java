@@ -7,7 +7,7 @@ import javafx.scene.text.Font;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 
-public class VisualPlace extends Place implements VisualNode {
+public class VisualPlace extends AbstractPlace<VisualEdge> implements VisualNode {
     public VisualPlace(String label, double x, double y) {
         super(label);
         _visual = new Visual(x, y);
@@ -61,8 +61,16 @@ public class VisualPlace extends Place implements VisualNode {
                 Diameter, Diameter);
     }
 
+    @Override
+    protected void addEdge(Node<VisualEdge> src, Node<VisualEdge> dest) {
+        _outgoingEdges.add(new VisualEdge(src, dest));
+        _incomingNodes.add(src);
+    }
+
     private Visual _visual;
 
     public static double Diameter = 50;
     public static int LineSize = 1;
+
+
 }

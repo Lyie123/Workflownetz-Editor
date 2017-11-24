@@ -2,21 +2,12 @@ package workflownet;
 
 import java.util.ArrayList;
 
-public abstract class Node extends NetElement implements INode{
+public abstract class Node<T extends Edge> extends NetElement implements INode{
     public Node(String label, NetElementType type) {
         super(type);
         _outgoingEdges = new ArrayList<>();
         _incomingNodes = new ArrayList<>();
         _label = label;
-    }
-
-    @Override
-    public String toString(){
-        String buffer = "";
-        for(Edge e : _outgoingEdges){
-            buffer += e.toString() + ", ";
-        }
-        return buffer;
     }
 
     //region Getter/Setter
@@ -43,10 +34,10 @@ public abstract class Node extends NetElement implements INode{
                     " sind bereits verbunden");
         }
         else {
-            this._outgoingEdges.add(new Edge(this, n));
-            n._incomingNodes.add(this);
+            addEdge(this, n);
         }
     }
+    abstract protected void addEdge(Node<T> src, Node<T> dest);
     /**
      * Lösche ausgehende Kante von diesen Knoten zu Knoten n
      * @param n
@@ -93,14 +84,12 @@ public abstract class Node extends NetElement implements INode{
         _incomingNodes.clear();
     }
 
-
-
     /**
      * Stellt eine Adjazenliste dar.
      * Der Knoten ist mit den Knoten in der Liste über eine gerichtete Kante verbunden.
      * Wobei der Knoten der Quellknoten und die Knoten in der Adjazenliste die Zielknoten darstellen.
      */
-    protected ArrayList<Edge> _outgoingEdges;
+    protected ArrayList<T> _outgoingEdges;
     protected ArrayList<Node> _incomingNodes;
     private String _label;
 }

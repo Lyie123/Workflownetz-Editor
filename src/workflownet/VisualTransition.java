@@ -7,7 +7,7 @@ import javafx.scene.text.Font;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 
-public class VisualTransition extends Transition implements VisualNode {
+public class VisualTransition extends AbstractTransition<VisualEdge> implements VisualNode {
     public VisualTransition(String label, double x, double y) {
         super(label);
         _visual = new Visual(x, y);
@@ -60,6 +60,12 @@ public class VisualTransition extends Transition implements VisualNode {
         gc.strokeRect(_visual.getPoint().getX() - Width/2, _visual.getPoint().getY() - Height/2,
                 Width, Height);
     }
+    @Override
+    protected void addEdge(Node<VisualEdge> src, Node<VisualEdge> dest) {
+        _outgoingEdges.add(new VisualEdge(src, dest));
+        _incomingNodes.add(src);
+    }
+
 
     public static double Height = 50;
     public static double Width = 50;
