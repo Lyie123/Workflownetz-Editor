@@ -17,6 +17,7 @@ public abstract class NetElement implements IDrawable{
     public NetElementType getType() {
         return _type;
     }
+    public boolean Selected = false;
 
     private NetElementType _type;
     private int _id;

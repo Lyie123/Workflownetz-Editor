@@ -20,9 +20,12 @@ public class Edge extends NetElement {
     @Override
     public void draw(Canvas canvas) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        int arrSize = 6;
+        if(Selected){
+            gc.setStroke(Color.RED);
+            gc.setFill(Color.RED);
+        }
 
-        gc.setFill(Color.BLACK);
+        int arrSize = 6;
 
         Point2D p1 = getSource().getPoint();
         Point2D p2 = getDestination().getPoint();
@@ -40,11 +43,16 @@ public class Edge extends NetElement {
                 4);
 
         gc.setTransform(new Affine());
+
+        gc.setStroke(Color.BLACK);
+        gc.setFill(Color.BLACK);
     }
 
     @Override
     public boolean PointLiesOnNetElement(Point2D p) {
-        return false;
+        //todo Linienstärke ist noch nicht mit einberechnet
+        return getSource().getPoint().distance(p) + getDestination().getPoint().distance(p)
+               == getSource().getPoint().distance(getDestination().getPoint());
     }
 
     private Node _dest;

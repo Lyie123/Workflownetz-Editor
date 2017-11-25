@@ -25,17 +25,26 @@ public interface IWorkflownet extends IDrawable {
     NetElement get(int id) throws IllegalArgumentException;
 
     /**
-     * Sucht nach einen Netzelement abhängig von der Position p und gibt es zurück
-     * @param p Position die überprüft werden soll, ob es auf einen Netzelement liegt
-     * @return wenn p auf einen Netzelement liegt, gib dieses Element zurück,
-     *         sonst null
-     */
-    NetElement get(Point2D p);
-
-    /**
      * Verbindet die zwei Netzelement miteinander. Vorraussetzung ist das die Netzelemente Knoten einen unterschiedlichen Subtype haben
      * @param srcId Id des Quellen Netzelements
      * @param destId Id des Ziel Netzelements
      */
     void connect(int srcId, int destId) throws IllegalArgumentException;
+
+    /**
+     * Überprüft ob der Punkt p auf einen Netzelement liegt
+     * @param p Punkt überprüft werden soll
+     * @return Falls p auf einem Netzelement liegt wird das erste Netzelement zurückgegeben
+     *         sonst null
+     */
+    NetElement get(Point2D p);
+
+    /**Setzt ein Netzelement auf den Zustand "Selected"
+     * @param id Netzelement das ausgewählt werden soll
+     */
+    void triggerNetElement(int id);
+
+    void deselectAllNetElement();
+
+    void deleteAllSelectedNetElement();
 }

@@ -3,6 +3,7 @@ package workflownet;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 public class Place extends Node {
     public Place(String label) {
@@ -14,13 +15,24 @@ public class Place extends Node {
     @Override
     public void draw(Canvas canvas) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        drawLabel(canvas, Diameter, Diameter);
+
+        if(Selected) gc.setStroke(Color.RED);
+
         gc.setLineWidth(StrokeThikness);
         gc.strokeOval(getPoint().getX() - Diameter/2, getPoint().getY() - Diameter/2,
                 Diameter, Diameter);
+
+        gc.setStroke(Color.BLACK);
     }
 
     @Override
     public boolean PointLiesOnNetElement(Point2D p) {
-        return false;
+        double radius = Diameter/2;
+        double xl = getPoint().getX() - p.getX();
+        double yl = getPoint().getY() - p.getY();
+        double length = Math.sqrt(Math.pow(xl, 2) + Math.pow(yl, 2));
+        return radius >= length;
     }
 }

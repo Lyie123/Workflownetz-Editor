@@ -43,14 +43,6 @@ public class Workflownet implements IWorkflownet {
     }
 
     @Override
-    public NetElement get(Point2D p) {
-        for(NetElement e : getAllNetElements()){
-            if(e.PointLiesOnNetElement(p)) return e;
-        }
-        return null;
-    }
-
-    @Override
     public void connect(int srcId, int destId) throws IllegalArgumentException {
         NetElement e1 = get(srcId);
         NetElement e2 = get(destId);
@@ -69,13 +61,48 @@ public class Workflownet implements IWorkflownet {
     }
 
     @Override
+    public NetElement get(Point2D p) {
+        for(NetElement e : getAllNetElements()){
+            if(e.PointLiesOnNetElement(p)) return e;
+        }
+        return null;
+    }
+
+    @Override
+    public void triggerNetElement(int id) {
+        for(NetElement e : getAllNetElements()){
+            if(e.getId() == id){
+                e.Selected = !e.Selected;
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Netzelement konnte nicht selektiert werden. Das Netzelement mit der id "
+                + id + " ist nicht Teil des Workflownetzes.");
+    }
+
+    @Override
+    public void deselectAllNetElement(){
+        getAllNetElements().forEach(e -> e.Selected = false );
+    }
+
+    @Override
+    public void deleteAllSelectedNetElement() {
+        getAllNetElements().forEach(e -> {
+            if(e.Selected) delete(e.getId());
+        });
+    }
+
+    @Override
     public void draw(Canvas canvas) {
+        clear(canvas);
         _nodeSet.values().forEach(n -> {
             n.draw(canvas);
             n.getOutgoingEdges().forEach(e -> e.draw(canvas));
         });
     }
-
+    private void clear(Canvas canvas){
+        canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+    }
 
     /** Lösche die Kante mit der id aus dem Workflownetz
      * @param id des Netzelements das gelöscht werden soll
