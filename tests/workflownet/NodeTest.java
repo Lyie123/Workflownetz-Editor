@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 class NodeTest {
     @Test
     void deleteEdgeTo() {
-        VisualWorkflowNet v = new VisualWorkflowNet();
 
     }
 

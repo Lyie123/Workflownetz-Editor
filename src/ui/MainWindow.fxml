@@ -32,6 +32,6 @@
         </StackPane>
     </bottom>
     <center>
-        <Canvas fx:id="myCanvas" height="940" onMouseClicked="#test" width="1770" BorderPane.alignment="TOP_LEFT" />
+        <Canvas fx:id="myCanvas" height="940" onMousePressed="#ClickedOnCanvas" width="1770" BorderPane.alignment="TOP_LEFT" />
     </center>
 </BorderPane>

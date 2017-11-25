@@ -1,10 +1,10 @@
 package pnml;
 
 import javafx.geometry.Point2D;
-import workflownet.VisualPlace;
-import workflownet.VisualTransition;
-import workflownet.VisualWorkflowNet;
-import workflownet.WorkflowNet;
+import workflownet.Node;
+import workflownet.Place;
+import workflownet.Transition;
+import workflownet.Workflownet;
 
 import java.io.File;
 import java.util.HashMap;
@@ -41,7 +41,7 @@ public class MyParser extends PNMLParser{
      */
     @Override
     public void setName(String id, String name) {
-        _workflowNet.getNode(_idMap.get(id)).setLabel(name);
+        ((Node)_workflowNet.get(_idMap.get(id))).setLabel(name);
     }
 
     /**
@@ -54,7 +54,7 @@ public class MyParser extends PNMLParser{
      */
     @Override
     public void setPosition(String id, String x, String y) {
-        _workflowNet.getNode(_idMap.get(id)).getVisual().setPoint(new Point2D(Double.parseDouble(x), Double.parseDouble(y)));
+        ((Node)_workflowNet.get(_idMap.get(id))).setPoint(new Point2D(Double.parseDouble(x), Double.parseDouble(y)));
     }
 
     /**
@@ -64,7 +64,7 @@ public class MyParser extends PNMLParser{
      */
     @Override
     public void newPlace(String id) {
-        _idMap.put(id, _workflowNet.addNode(new VisualPlace("", 0, 0)));
+        _idMap.put(id, _workflowNet.add(new Place("")));
     }
 
     /**
@@ -77,7 +77,7 @@ public class MyParser extends PNMLParser{
     @Override
     public void newArc(String id, String source, String target) {
         //todo id von kante wird nicht abgespeichert
-        _workflowNet.connectNodes(_idMap.get(source), _idMap.get(target));
+        _workflowNet.connect(_idMap.get(source), _idMap.get(target));
     }
 
     /**
@@ -87,14 +87,14 @@ public class MyParser extends PNMLParser{
      */
     @Override
     public void newTransition(String id) {
-        _idMap.put(id, _workflowNet.addNode(new VisualTransition("", 0, 0)));
+        _idMap.put(id, _workflowNet.add(new Transition("")));
     }
 
     /**
      * @return Gibt das geparste Workflownetz zurück
      */
-    public VisualWorkflowNet CreateWorkflow(){
-        _workflowNet = new VisualWorkflowNet();
+    public Workflownet CreateWorkflow(){
+        _workflowNet = new Workflownet();
         _idMap = new HashMap<>();
         this.initParser();
         this.parse();
@@ -104,7 +104,7 @@ public class MyParser extends PNMLParser{
     /**
      * Workflownetz das durch den Parser erzeugt und zurückgegeben wird.
      */
-    private VisualWorkflowNet _workflowNet;
+    private Workflownet _workflowNet;
     /**
      * Mapped die Id in der Workflownetz Datei mit der Id des ersellten Workflownetzes.
      */

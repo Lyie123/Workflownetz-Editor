@@ -8,8 +8,9 @@ public interface IWorkflownet extends IDrawable {
      * Der Knoten n wir dem Workflownetz hinzugefügt. Falls der Knoten bereits existiert,
      * wird der Knoten überschrieben.
      * @param n Knoten der den Workflownetz hinzugefügt werden soll
+     * @return gibt die id des hinzugefügten Netzelements zurück
      */
-    void add(Node n);
+    int add(Node n);
 
     /**Löscht das Netzelement mit der id aus dem Workflownetz
      * @param id Netelement das aus dem Workflownetz gelöscht werden soll

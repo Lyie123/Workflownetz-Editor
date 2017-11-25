@@ -14,8 +14,9 @@ public class Workflownet implements IWorkflownet {
     private HashMap<Integer, Node> _nodeSet = new HashMap<>();
 
     @Override
-    public void add(Node n) {
+    public int add(Node n) {
         _nodeSet.put(n.getId(), n);
+        return n.getId();
     }
 
     @Override
@@ -68,10 +69,10 @@ public class Workflownet implements IWorkflownet {
     }
 
     @Override
-    public void Draw(Canvas canvas) {
+    public void draw(Canvas canvas) {
         _nodeSet.values().forEach(n -> {
-            n.Draw(canvas);
-            n.getOutgoingEdges().forEach(e -> e.Draw(canvas));
+            n.draw(canvas);
+            n.getOutgoingEdges().forEach(e -> e.draw(canvas));
         });
     }
 

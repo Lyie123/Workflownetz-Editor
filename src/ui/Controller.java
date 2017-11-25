@@ -8,7 +8,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import workflownet.*;
-import javafx.geometry.Point2D;
+
 import java.io.File;
 
 public class Controller {
@@ -17,12 +17,12 @@ public class Controller {
     @FXML
     private Text statusMsg;
 
-    private VisualWorkflowNet workflow;
+    private Workflownet workflow;
 
     @FXML
     private void initialize() {
         GraphicsContext gc =  myCanvas.getGraphicsContext2D();
-        workflow = new VisualWorkflowNet();
+        workflow = new Workflownet();
     }
 
     @FXML
@@ -34,7 +34,7 @@ public class Controller {
         if(selectedFile != null){
             pnml.MyParser p = new pnml.MyParser(selectedFile);
             workflow = p.CreateWorkflow();
-            drawCanvas();
+            drawWorkflownet();
         }
         else{
         }
@@ -42,19 +42,20 @@ public class Controller {
 
 
 
-    private void drawCanvas(){
-        workflow.clear(myCanvas);
+    private void drawWorkflownet(){
+        clearCanvas();
         workflow.draw(myCanvas);
     }
+    private void clearCanvas(){
+        myCanvas.getGraphicsContext2D().clearRect(0, 0, myCanvas.getWidth(), myCanvas.getHeight());
+    }
 
-    public void test(MouseEvent mouseEvent) {
-        if(mouseEvent.isPrimaryButtonDown()){
-            if(workflow == null) return;
-            INetELement v = workflow.isNetElementClicked(new Point2D(mouseEvent.getX(), mouseEvent.getY()));
-            if(v != null){
-                statusMsg.setText("Klick auf Node");
-            }
-            statusMsg.setText("");
+    public void ClickedOnCanvas(MouseEvent event){
+        if(event.isPrimaryButtonDown()){
+            statusMsg.setText("primary");
+        }
+        else if(event.isSecondaryButtonDown()){
+            statusMsg.setText("secondary");
         }
     }
 }
