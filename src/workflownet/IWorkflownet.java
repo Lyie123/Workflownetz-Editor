@@ -1,6 +1,9 @@
 package workflownet;
 
+import javafx.event.Event;
 import javafx.geometry.Point2D;
+
+import java.util.Observer;
 
 public interface IWorkflownet extends IDrawable {
 
@@ -25,13 +28,6 @@ public interface IWorkflownet extends IDrawable {
     NetElement get(int id) throws IllegalArgumentException;
 
     /**
-     * Verbindet die zwei Netzelement miteinander. Vorraussetzung ist das die Netzelemente Knoten einen unterschiedlichen Subtype haben
-     * @param srcId Id des Quellen Netzelements
-     * @param destId Id des Ziel Netzelements
-     */
-    void connect(int srcId, int destId) throws IllegalArgumentException;
-
-    /**
      * Überprüft ob der Punkt p auf einen Netzelement liegt
      * @param p Punkt überprüft werden soll
      * @return Falls p auf einem Netzelement liegt wird das erste Netzelement zurückgegeben
@@ -39,12 +35,21 @@ public interface IWorkflownet extends IDrawable {
      */
     NetElement get(Point2D p);
 
+    /**
+     * Verbindet die zwei Netzelement miteinander. Vorraussetzung ist das die Netzelemente Knoten einen unterschiedlichen Subtype haben
+     * @param srcId Id des Quellen Netzelements
+     * @param destId Id des Ziel Netzelements
+     */
+    void connect(int srcId, int destId) throws IllegalArgumentException;
+
     /**Setzt ein Netzelement auf den Zustand "Selected"
      * @param id Netzelement das ausgewählt werden soll
      */
     void triggerNetElement(int id);
 
-    void deselectAllNetElement();
+    void unselectAllNetElement();
 
-    void deleteAllSelectedNetElement();
+    void deleteAllSelectedNetElements();
+
+    void moveAllSelectedElementsBy(Point2D distance);
 }

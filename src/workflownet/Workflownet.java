@@ -7,10 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Workflownet implements IWorkflownet {
-
-    public static void main(String args[]){
-    }
-
     private HashMap<Integer, Node> _nodeSet = new HashMap<>();
 
     @Override
@@ -56,6 +52,13 @@ public class Workflownet implements IWorkflownet {
                     "da die beiden Knoten vom selben Typ sind.");
         }
 
+        ((Node)e1)._outgoingEdges.forEach(edge -> {
+            if(edge.getDestination() != null){
+                if(edge.getDestination().getId() == e2.getId())
+                    throw new IllegalArgumentException("Es besteht bereits eine Verbindung zu diesem Knoten");
+            }
+        });
+
         //Knoten können miteinander verbunden werden.
         ((Node)e1).connectNodeTo((Node)e2);
     }
@@ -81,14 +84,22 @@ public class Workflownet implements IWorkflownet {
     }
 
     @Override
-    public void deselectAllNetElement(){
+    public void unselectAllNetElement(){
         getAllNetElements().forEach(e -> e.Selected = false );
     }
 
     @Override
-    public void deleteAllSelectedNetElement() {
-        getAllNetElements().forEach(e -> {
-            if(e.Selected) delete(e.getId());
+    public void deleteAllSelectedNetElements() {
+        getAllSelectedNetElements().forEach(e -> delete(e.getId()));
+    }
+
+    @Override
+    public void moveAllSelectedElementsBy(Point2D distance){
+        getAllSelectedNetElements().forEach(e -> {
+            if(e.getType() != NetElementType.Edge){
+                Node buffer = (Node)e;
+                buffer.setPoint(buffer.getPoint().subtract(distance));
+            }
         });
     }
 
@@ -100,6 +111,9 @@ public class Workflownet implements IWorkflownet {
             n.getOutgoingEdges().forEach(e -> e.draw(canvas));
         });
     }
+
+    /** Löscht alle Shapes die auf die Canvas gezeichnet wurden
+     */
     private void clear(Canvas canvas){
         canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
@@ -124,6 +138,7 @@ public class Workflownet implements IWorkflownet {
     }
 
     /**
+     * Gibt eine Liste von allen Netzelementen zurück
      * @return Eine Liste von Netzelementen die Teil des Workflownetzes sind
      */
     private ArrayList<NetElement> getAllNetElements(){
@@ -133,5 +148,16 @@ public class Workflownet implements IWorkflownet {
             n.getOutgoingEdges().forEach(e -> netElements.add(e));
         });
         return netElements;
+    }
+
+    /**Gibt alle selektierten Netzelemente zurück
+     * @return Liste von selektierten Netzelementen
+     */
+    private ArrayList<NetElement> getAllSelectedNetElements(){
+        ArrayList<NetElement> buffer = new ArrayList<>();
+        getAllNetElements().forEach(e -> {
+            if(e.Selected) buffer.add(e);
+        });
+        return buffer;
     }
 }
