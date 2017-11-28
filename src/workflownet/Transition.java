@@ -21,6 +21,10 @@ public class Transition extends Node {
 
         if(Selected) gc.setStroke(Color.RED);
 
+        gc.setFill(Color.WHITE);
+        gc.fillRect(getPoint().getX() - Width/2, getPoint().getY() - Height/2,
+                Width, Height);
+
         gc.setLineWidth(StrokeThikness);
         gc.strokeRect(getPoint().getX() - Width/2, getPoint().getY() - Height/2,
                 Width, Height);

@@ -20,6 +20,10 @@ public class Place extends Node {
 
         if(Selected) gc.setStroke(Color.RED);
 
+        gc.setFill(Color.WHITE);
+        gc.fillOval(getPoint().getX() - Diameter/2, getPoint().getY() - Diameter/2,
+                Diameter, Diameter);
+
         gc.setLineWidth(StrokeThikness);
         gc.strokeOval(getPoint().getX() - Diameter/2, getPoint().getY() - Diameter/2,
                 Diameter, Diameter);

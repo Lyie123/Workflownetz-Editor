@@ -107,8 +107,8 @@ public class Workflownet implements IWorkflownet {
     public void draw(Canvas canvas) {
         clear(canvas);
         _nodeSet.values().forEach(n -> {
-            n.draw(canvas);
             n.getOutgoingEdges().forEach(e -> e.draw(canvas));
+            n.draw(canvas);
         });
     }
 

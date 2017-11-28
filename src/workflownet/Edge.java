@@ -22,9 +22,9 @@ public class Edge extends NetElement {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         if(Selected){
             gc.setStroke(Color.RED);
-            gc.setFill(Color.RED);
         }
 
+        gc.setFill(Color.BLACK);
         int arrSize = 6;
 
         Point2D p1 = getSource().getPoint();
@@ -38,14 +38,27 @@ public class Edge extends NetElement {
         transform = transform.createConcatenation(Transform.rotate(Math.toDegrees(angle), 0, 0));
         gc.setTransform(new Affine(transform));
 
-        gc.strokeLine(0, 0, len, 0);
-        gc.fillPolygon(new double[]{len, len - arrSize, len - arrSize, len}, new double[]{0, -arrSize, arrSize, 0},
+        double offset = 0;
+        switch(getDestination().getType()){
+            case Place:
+                offset = Place.Diameter/2;
+                break;
+            case Transition:
+                double degree = Math.abs(Math.toDegrees(angle));
+                while (degree > 45){
+                    degree-=90;
+                }
+                offset = (Transition.Width/2) / (Math.cos(Math.toRadians(degree)));
+                break;
+        }
+
+        gc.strokeLine(0, 0, len - offset, 0);
+        gc.fillPolygon(new double[]{len - offset, len - arrSize - offset, len - arrSize - offset, len - offset}, new double[]{0, -arrSize, arrSize, 0},
                 4);
 
         gc.setTransform(new Affine());
 
         gc.setStroke(Color.BLACK);
-        gc.setFill(Color.BLACK);
     }
 
     @Override
