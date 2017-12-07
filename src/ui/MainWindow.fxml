@@ -11,17 +11,17 @@
     <left>
         <ToolBar orientation="VERTICAL" prefWidth="150">
             <items>
-                <Button onMouseClicked="#clickOnEdit">Bearbeiten</Button>
-                <Button onMouseClicked="#clickOnCreateTransition">Transistion</Button>
-                <Button onMouseClicked="#clickOnCreatePlace">Stelle</Button>
-                <Button onMouseClicked="#clickOnCreateConnection">Kante</Button>
+                <Button onMouseClicked="#buttonEdit">Bearbeiten</Button>
+                <Button onMouseClicked="#buttonCreateTransition">Transistion</Button>
+                <Button onMouseClicked="#buttonCreatePlace">Stelle</Button>
+                <Button onMouseClicked="#buttonCreateConnection">Kante</Button>
             </items>
         </ToolBar>
     </left>
     <top>
         <ToolBar orientation="HORIZONTAL" prefHeight="75">
             <items>
-                <Button fx:id="button2">button2</Button>
+                <Button fx:id="button2" onAction="#buttonSimulate">Simuliere Workflownetz</Button>
                 <Button fx:id="button3" onAction="#buttonOpenFile">Öffne Workflownetz</Button>
                 <Button>button4</Button>
             </items>

@@ -4,7 +4,9 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.ListIterator;
 
 public class Workflownet implements IWorkflownet {
     private HashMap<Integer, Node> _nodeSet = new HashMap<>();
@@ -65,9 +67,14 @@ public class Workflownet implements IWorkflownet {
 
     @Override
     public NetElement get(Point2D p) {
-        for(NetElement e : getAllNetElements()){
-            if(e.PointLiesOnNetElement(p)) return e;
+        ArrayList<NetElement> buffer = getAllNetElements();
+
+        //Die Liste muss rückwärts durchlaufen werden damit beim klicken auf ein Netzelement immer das zuletzt gezeichnete
+        //Netzelement ausgewählt wird.
+        for(int i = buffer.size()-1; i >= 0; --i){
+            if(buffer.get(i).PointLiesOnNetElement(p)) return buffer.get(i);
         }
+
         return null;
     }
 
@@ -99,6 +106,18 @@ public class Workflownet implements IWorkflownet {
             if(e.getType() != NetElementType.Edge){
                 Node buffer = (Node)e;
                 buffer.setPoint(buffer.getPoint().subtract(distance));
+            }
+        });
+    }
+
+    @Override
+    public void clearAllTokens() {
+        _nodeSet.values().forEach(n ->{
+            if(n.getType() == NetElementType.Place){
+                ((Place)n).setToken(false);
+            }
+            else if(n.getType() == NetElementType.Transition){
+                ((Transition)n).setActive(false);
             }
         });
     }
@@ -159,5 +178,30 @@ public class Workflownet implements IWorkflownet {
             if(e.Selected) buffer.add(e);
         });
         return buffer;
+    }
+
+    /**
+     * Prüft ob das Petrinetz ein Workflownetz ist.
+     *
+     * Wenn es sich um ein Workflownetz handelt:
+     * Falls noch keine Marken gesetzt sind setze Anfangsmarke und Transition.
+     * Falls Marken schon gesetzt wird keine Anfangsmarke gesetzt.
+     *
+     * Falls es kein Workflownetz ist:
+     * entferne alle Marken und deaktiviere alle Transistionen.
+     */
+    private void check() {
+        //Prüfe ob es genau eine Anfangsstelle gibt
+        //Prüfe ob es genau eine Ausgangsstelle gibt
+        //Prüfe ob jeder Knoten erreichbar ist
+
+        //Setup Workflownet
+        setStartMark();
+
+        //Clear Tokens etc
+    }
+
+    private void setStartMark(){
+        clearAllTokens();
     }
 }

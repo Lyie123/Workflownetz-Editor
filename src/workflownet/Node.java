@@ -1,5 +1,6 @@
 package workflownet;
 
+import com.sun.javafx.tk.Toolkit;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -23,7 +24,10 @@ public abstract class Node extends NetElement {
         gc.setLineWidth(StrokeThikness);
         gc.setFont(new Font("Verdana", FontSize));
         gc.setFill(Color.BLACK);
-        gc.fillText(getLabel(), getPoint().getX() - width/2,
+
+        float textWidth = Toolkit.getToolkit().getFontLoader().computeStringWidth(getLabel(), gc.getFont());
+
+        gc.fillText(getLabel(), getPoint().getX() - textWidth/2,
                 getPoint().getY() + height/2 + FontSize);
     }
     public String getLabel() { return _label; }
@@ -41,3 +45,4 @@ public abstract class Node extends NetElement {
     protected String _label;
     protected Point2D _point;
 }
+

@@ -45,6 +45,7 @@ public class Controller {
             pnml.MyParser p = new pnml.MyParser(selectedFile);
             _workflow = p.CreateWorkflow();
             _workflow.draw(myCanvas);
+            buttonSimulate(actionEvent);
         }
     }
 
@@ -80,25 +81,31 @@ public class Controller {
     }
 
     @FXML
-    public void clickOnEdit(MouseEvent event){
+    public void buttonEdit(MouseEvent event){
         _status = MainWindowStatus.Edit;
         unselectAllNetElements();
     }
 
     @FXML
-    public void clickOnCreatePlace(MouseEvent mouseEvent) {
+    public void buttonSimulate(ActionEvent actionEvent) {
+        _status = MainWindowStatus.Simulate;
+        _workflow.unselectAllNetElement();
+    }
+
+    @FXML
+    public void buttonCreatePlace(MouseEvent mouseEvent) {
         _status = MainWindowStatus.CreatePlace;
         unselectAllNetElements();
     }
 
     @FXML
-    public void clickOnCreateTransition(MouseEvent mouseEvent) {
+    public void buttonCreateTransition(MouseEvent mouseEvent) {
         _status = MainWindowStatus.CreateTransition;
         unselectAllNetElements();
     }
 
     @FXML
-    public void clickOnCreateConnection(MouseEvent event) {
+    public void buttonCreateConnection(MouseEvent event) {
         _status = MainWindowStatus.CreateConnection;
         _connectNodes.clear();
         unselectAllNetElements();
@@ -226,6 +233,4 @@ public class Controller {
         _workflow.unselectAllNetElement();
         _workflow.draw(myCanvas);
     }
-
-
 }

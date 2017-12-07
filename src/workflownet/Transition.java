@@ -10,6 +10,11 @@ public class Transition extends Node {
         super(NetElementType.Transition, label);
     }
 
+    private boolean _active = false;
+
+    public boolean isActive(){ return _active; }
+    public void setActive(boolean active){ _active = active; }
+
     public static double Height = 50;
     public static double Width = 50;
 
@@ -21,7 +26,8 @@ public class Transition extends Node {
 
         if(Selected) gc.setStroke(Color.RED);
 
-        gc.setFill(Color.WHITE);
+        if(isActive()) gc.setFill(Color.LIGHTGREEN);
+        else gc.setFill(Color.WHITE);
         gc.fillRect(getPoint().getX() - Width/2, getPoint().getY() - Height/2,
                 Width, Height);
 
@@ -30,6 +36,7 @@ public class Transition extends Node {
                 Width, Height);
 
         gc.setStroke(Color.BLACK);
+        gc.setFill(Color.WHITE);
     }
 
     @Override

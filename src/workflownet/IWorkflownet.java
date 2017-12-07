@@ -52,4 +52,6 @@ public interface IWorkflownet extends IDrawable {
     void deleteAllSelectedNetElements();
 
     void moveAllSelectedElementsBy(Point2D distance);
+
+    void clearAllTokens();
 }
