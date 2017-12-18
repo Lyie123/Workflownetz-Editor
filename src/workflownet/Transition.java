@@ -13,7 +13,7 @@ public class Transition extends Node {
     private boolean _active = false;
 
     public boolean isActive(){ return _active; }
-    public void setActive(boolean active){ _active = active; }
+    void setActive(boolean active){ _active = active; }
 
     public static double Height = 50;
     public static double Width = 50;

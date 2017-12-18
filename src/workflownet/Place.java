@@ -4,6 +4,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 public class Place extends Node {
     public Place(String label) {
@@ -11,9 +12,30 @@ public class Place extends Node {
     }
 
     private boolean _token = false;
+    public boolean _startPlace = false;
+    public boolean _endPlace = false;
 
     public boolean hasToken(){ return _token; }
-    public boolean setToken(boolean token) { return _token; }
+    void setToken(boolean token) {
+        _token = token;
+        _outgoingEdges.forEach(n -> {
+            Transition t = (Transition) n.getDestination();
+            boolean isActive = false;
+            for(Edge e : t._incomingEdges){
+                if(!((Place)e.getSource()).hasToken()){
+                    t.setActive(false);
+                    return;
+                }
+                isActive = true;
+            }
+            t.setActive(isActive);
+        });
+    }
+    public boolean isStartPlace(){ return _startPlace; }
+    void setStartPlace(boolean startPlace){ _startPlace = startPlace; }
+    public boolean isEndPlace(){ return _endPlace; }
+    void setEndPlace(boolean endPlace){ _endPlace = endPlace; }
+
 
     public static double Diameter = 50;
 
@@ -37,6 +59,9 @@ public class Place extends Node {
     }
 
     private void drawPlace(GraphicsContext gc){
+        if(_startPlace) gc.setStroke(Color.PURPLE);
+        else if(_endPlace) gc.setStroke(Color.PURPLE);
+
         if(Selected) gc.setStroke(Color.RED);
 
         gc.setFill(Color.WHITE);

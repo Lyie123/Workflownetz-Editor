@@ -37,11 +37,13 @@ public abstract class Node extends NetElement {
 
     void connectNodeTo(Node dest){
         this._outgoingEdges.add(new Edge(this, dest));
+        dest._incomingEdges.add(new Edge(this, dest));
     }
 
     public double FontSize = 14;
 
     protected ArrayList<Edge> _outgoingEdges = new ArrayList<>();
+    protected ArrayList<Edge> _incomingEdges = new ArrayList<>();
     protected String _label;
     protected Point2D _point;
 }

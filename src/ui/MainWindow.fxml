@@ -7,11 +7,12 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Text?>
 
+<?import ui.SwitchButton?>
 <BorderPane onKeyPressed="#keyPressed" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.Controller">
     <left>
         <ToolBar orientation="VERTICAL" prefWidth="150">
             <items>
-                <Button onMouseClicked="#buttonEdit">Bearbeiten</Button>
+                <Button onMouseClicked="#buttonSelect">Bearbeiten</Button>
                 <Button onMouseClicked="#buttonCreateTransition">Transistion</Button>
                 <Button onMouseClicked="#buttonCreatePlace">Stelle</Button>
                 <Button onMouseClicked="#buttonCreateConnection">Kante</Button>
@@ -21,8 +22,8 @@
     <top>
         <ToolBar orientation="HORIZONTAL" prefHeight="75">
             <items>
-                <Button fx:id="button2" onAction="#buttonSimulate">Simuliere Workflownetz</Button>
                 <Button fx:id="button3" onAction="#buttonOpenFile">Öffne Workflownetz</Button>
+                <SwitchButton fx:id="switchButton"></SwitchButton>
                 <Button>button4</Button>
             </items>
         </ToolBar>

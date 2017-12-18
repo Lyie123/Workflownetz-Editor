@@ -4,23 +4,24 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.ListIterator;
+import java.util.HashSet;
 
 public class Workflownet implements IWorkflownet {
     private HashMap<Integer, Node> _nodeSet = new HashMap<>();
+    private boolean _isWorkflownet = false;
 
     @Override
     public int add(Node n) {
         _nodeSet.put(n.getId(), n);
+        checkIfWorkflownet();
         return n.getId();
     }
 
     @Override
     public void delete(int id) throws IllegalArgumentException {
         NetElement buffer = get(id);
-        switch (buffer.getType()){
+        switch (buffer.getType()) {
             case Edge:
                 deleteEdge(id);
                 break;
@@ -29,12 +30,13 @@ public class Workflownet implements IWorkflownet {
                 deleteNode(id);
                 break;
         }
+        checkIfWorkflownet();
     }
 
     @Override
-    public NetElement get(int id) throws IllegalArgumentException{
-        for(NetElement n : getAllNetElements()){
-            if(n.getId() == id) return n;
+    public NetElement get(int id) throws IllegalArgumentException {
+        for (NetElement n : getAllNetElements()) {
+            if (n.getId() == id) return n;
         }
         throw new IllegalArgumentException("Netzelement konnte nicht gelöscht werden.\n" +
                 "Es existiert kein Netzelement mit der id " + id + " im Workflownetz.");
@@ -45,24 +47,24 @@ public class Workflownet implements IWorkflownet {
         NetElement e1 = get(srcId);
         NetElement e2 = get(destId);
 
-        if(e1.getType() == NetElementType.Edge || e2.getType() == NetElementType.Edge){
+        if (e1.getType() == NetElementType.Edge || e2.getType() == NetElementType.Edge) {
             throw new IllegalArgumentException("Die Netzelemente können nicht miteinander verbunden werden, " +
                     "da mindestens eines der Elemente eine Kante ist.");
-        }
-        else if(e1.getType() == e2.getType()){
+        } else if (e1.getType() == e2.getType()) {
             throw new IllegalArgumentException("Die Netzelemente können nicht miteinander verbunden werden, " +
                     "da die beiden Knoten vom selben Typ sind.");
         }
 
-        ((Node)e1)._outgoingEdges.forEach(edge -> {
-            if(edge.getDestination() != null){
-                if(edge.getDestination().getId() == e2.getId())
+        ((Node) e1)._outgoingEdges.forEach(edge -> {
+            if (edge.getDestination() != null) {
+                if (edge.getDestination().getId() == e2.getId())
                     throw new IllegalArgumentException("Es besteht bereits eine Verbindung zu diesem Knoten");
             }
         });
 
         //Knoten können miteinander verbunden werden.
-        ((Node)e1).connectNodeTo((Node)e2);
+        ((Node) e1).connectNodeTo((Node) e2);
+        checkIfWorkflownet();
     }
 
     @Override
@@ -71,8 +73,8 @@ public class Workflownet implements IWorkflownet {
 
         //Die Liste muss rückwärts durchlaufen werden damit beim klicken auf ein Netzelement immer das zuletzt gezeichnete
         //Netzelement ausgewählt wird.
-        for(int i = buffer.size()-1; i >= 0; --i){
-            if(buffer.get(i).PointLiesOnNetElement(p)) return buffer.get(i);
+        for (int i = buffer.size() - 1; i >= 0; --i) {
+            if (buffer.get(i).PointLiesOnNetElement(p)) return buffer.get(i);
         }
 
         return null;
@@ -80,8 +82,8 @@ public class Workflownet implements IWorkflownet {
 
     @Override
     public void triggerNetElement(int id) {
-        for(NetElement e : getAllNetElements()){
-            if(e.getId() == id){
+        for (NetElement e : getAllNetElements()) {
+            if (e.getId() == id) {
                 e.Selected = !e.Selected;
                 return;
             }
@@ -91,8 +93,22 @@ public class Workflownet implements IWorkflownet {
     }
 
     @Override
-    public void unselectAllNetElement(){
-        getAllNetElements().forEach(e -> e.Selected = false );
+    public void fireTransistion(Point2D p) {
+        NetElement netElement = get(p);
+        if(netElement instanceof Transition){
+            Transition t = (Transition) netElement;
+            if(t.isActive()){
+               //Entferne alle Token von vorherigen Stellen
+               t._incomingEdges.forEach(e -> ((Place)e.getSource()).setToken(false));
+               t._outgoingEdges.forEach(e -> ((Place)e.getDestination()).setToken(true));
+            }
+        }
+        return;
+    }
+
+    @Override
+    public void unselectAllNetElement() {
+        getAllNetElements().forEach(e -> e.Selected = false);
     }
 
     @Override
@@ -101,25 +117,28 @@ public class Workflownet implements IWorkflownet {
     }
 
     @Override
-    public void moveAllSelectedElementsBy(Point2D distance){
+    public void moveAllSelectedElementsBy(Point2D distance) {
         getAllSelectedNetElements().forEach(e -> {
-            if(e.getType() != NetElementType.Edge){
-                Node buffer = (Node)e;
+            if (e.getType() != NetElementType.Edge) {
+                Node buffer = (Node) e;
                 buffer.setPoint(buffer.getPoint().subtract(distance));
             }
         });
     }
 
     @Override
-    public void clearAllTokens() {
-        _nodeSet.values().forEach(n ->{
-            if(n.getType() == NetElementType.Place){
+    public void reset() {
+        _nodeSet.values().forEach(n -> {
+            if(n instanceof Place){
                 ((Place)n).setToken(false);
+                ((Place)n).setStartPlace(false);
+                ((Place)n).setEndPlace(false);
             }
-            else if(n.getType() == NetElementType.Transition){
+            else{
                 ((Transition)n).setActive(false);
             }
         });
+        checkIfWorkflownet();
     }
 
     @Override
@@ -131,26 +150,39 @@ public class Workflownet implements IWorkflownet {
         });
     }
 
-    /** Löscht alle Shapes die auf die Canvas gezeichnet wurden
+    /**
+     * Löscht alle Shapes die auf die Canvas gezeichnet wurden
      */
-    private void clear(Canvas canvas){
+    private void clear(Canvas canvas) {
         canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
-    /** Lösche die Kante mit der id aus dem Workflownetz
+    /**
+     * Lösche die Kante mit der id aus dem Workflownetz
+     *
      * @param id des Netzelements das gelöscht werden soll
      */
-    private void deleteEdge(int id){
-        _nodeSet.values().forEach(n -> {
+    private void deleteEdge(int id) {
+        NetElement netElement = get(id);
+        if(netElement.getType() != NetElementType.Edge) return;
+        Edge edge = (Edge) netElement;
+        edge.getSource()._outgoingEdges.removeIf(e -> e.getDestination() == e.getDestination());
+        edge.getDestination()._incomingEdges.removeIf(e -> e.getSource() == edge.getSource());
+        /*_nodeSet.values().forEach(n -> {
+
             n._outgoingEdges.removeIf(e -> e.getId() == id);
-        });
+        };*/
+        checkIfWorkflownet();
     }
 
-    /**Lösche den Knoten mit der id aus dem Workflownetz
+    /**
+     * Lösche den Knoten mit der id aus dem Workflownetz
+     *
      * @param id des Netzelements das gelöscht werden soll
      */
-    private void deleteNode(int id){
+    private void deleteNode(int id) {
         _nodeSet.values().forEach(n -> {
+            n._incomingEdges.removeIf(e -> e.getSource().getId() == id);
             n._outgoingEdges.removeIf(e -> e.getDestination().getId() == id);
         });
         _nodeSet.remove(id);
@@ -158,9 +190,10 @@ public class Workflownet implements IWorkflownet {
 
     /**
      * Gibt eine Liste von allen Netzelementen zurück
+     *
      * @return Eine Liste von Netzelementen die Teil des Workflownetzes sind
      */
-    private ArrayList<NetElement> getAllNetElements(){
+    private ArrayList<NetElement> getAllNetElements() {
         ArrayList<NetElement> netElements = new ArrayList<>();
         _nodeSet.values().forEach(n -> {
             netElements.add(n);
@@ -169,39 +202,75 @@ public class Workflownet implements IWorkflownet {
         return netElements;
     }
 
-    /**Gibt alle selektierten Netzelemente zurück
+    /**
+     * Gibt alle selektierten Netzelemente zurück
+     *
      * @return Liste von selektierten Netzelementen
      */
-    private ArrayList<NetElement> getAllSelectedNetElements(){
+    private ArrayList<NetElement> getAllSelectedNetElements() {
         ArrayList<NetElement> buffer = new ArrayList<>();
         getAllNetElements().forEach(e -> {
-            if(e.Selected) buffer.add(e);
+            if (e.Selected) buffer.add(e);
         });
         return buffer;
     }
 
     /**
-     * Prüft ob das Petrinetz ein Workflownetz ist.
-     *
-     * Wenn es sich um ein Workflownetz handelt:
-     * Falls noch keine Marken gesetzt sind setze Anfangsmarke und Transition.
-     * Falls Marken schon gesetzt wird keine Anfangsmarke gesetzt.
-     *
-     * Falls es kein Workflownetz ist:
-     * entferne alle Marken und deaktiviere alle Transistionen.
+     * Prüft ob es sich um ein Workflownetz handelt.
+     * Falls ja setze Anfangsstelle, Endstelle und Anfangstoken.
+     * Sonst lösche alle Markierungen.
      */
-    private void check() {
-        //Prüfe ob es genau eine Anfangsstelle gibt
-        //Prüfe ob es genau eine Ausgangsstelle gibt
-        //Prüfe ob jeder Knoten erreichbar ist
-
-        //Setup Workflownet
-        setStartMark();
-
-        //Clear Tokens etc
+    private void checkIfWorkflownet() {
+        Place endPlace = checkIfEndPlaceExists();
+        Place startPlace = checkIfStartPlaceExists();
+        boolean directedPath = checkIfDirectedPathExists();
+        if(endPlace != null && startPlace != null && directedPath){
+            //Petrinetz ist ein Workflownetz. Setze Workflowspezifische Eigenschaften.
+            endPlace.setEndPlace(true);
+            startPlace.setStartPlace(true);
+            startPlace.setToken(true);
+        }
+        else{
+            //Workflownnetz besitzt nicht die Eigenschaften eines Workflownetzes
+            setNoWorkflowNetPropertys();
+        }
+    }
+    private void setNoWorkflowNetPropertys(){
+        _nodeSet.values().forEach(n -> {
+            if(n instanceof Place){
+                Place p = (Place)n;
+                p._endPlace = false;
+                p._startPlace = false;
+                p.setToken(false);
+            }
+            else if(n instanceof Transition){
+                Transition t = (Transition)n;
+                t.setActive(false);
+            }
+        });
     }
 
-    private void setStartMark(){
-        clearAllTokens();
+    private Place checkIfEndPlaceExists(){
+        ArrayList<Place> buffer = new ArrayList<>();
+        _nodeSet.values().forEach(n -> {
+            if(n instanceof Place){
+                if(n._outgoingEdges.size() == 0) buffer.add((Place)n);
+            }
+        });
+        if(buffer.size() == 1) return buffer.get(0);
+        else return null;
+    }
+    private Place checkIfStartPlaceExists(){
+        ArrayList<Place> buffer = new ArrayList<>();
+        _nodeSet.values().forEach(n -> {
+            if(n instanceof Place){
+                if(n._incomingEdges.size() == 0) buffer.add((Place)n);
+            }
+        });
+        if(buffer.size() == 1) return buffer.get(0);
+        else return null;
+    }
+    private boolean checkIfDirectedPathExists(){
+        return true;
     }
 }

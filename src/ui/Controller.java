@@ -1,11 +1,14 @@
 package ui;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -22,10 +25,12 @@ public class Controller {
     private Canvas myCanvas;
     @FXML
     private Text statusMsg;
+    @FXML
+    private SwitchButton switchButton;
 
     private Workflownet _workflow;
     private Point2D _dragStartingPoint;
-    private MainWindowStatus _status = MainWindowStatus.Edit;
+    private EditState _editState = EditState.Select;
     private Stack<Node> _connectNodes = new Stack<>();
 
     //region Events
@@ -33,6 +38,25 @@ public class Controller {
     private void initialize() {
         GraphicsContext gc =  myCanvas.getGraphicsContext2D();
         _workflow = new Workflownet();
+
+        //Tooltips festlegen
+        switchButton.setTooltip(new Tooltip("OFF: Editmodus aktiv\tON: Simulationsmodus aktiv"));
+
+        switchButton.switchOnProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
+                if(t1){
+                    //Simulationsmodus aktiviert
+                    _workflow.unselectAllNetElement();
+                }
+                else{
+                    //Editmodus aktiviert
+                    unselectAllNetElements();
+                    _workflow.reset();
+                }
+                _workflow.draw(myCanvas);
+            }
+        });
     }
 
     @FXML
@@ -45,7 +69,6 @@ public class Controller {
             pnml.MyParser p = new pnml.MyParser(selectedFile);
             _workflow = p.CreateWorkflow();
             _workflow.draw(myCanvas);
-            buttonSimulate(actionEvent);
         }
     }
 
@@ -59,7 +82,8 @@ public class Controller {
 
     @FXML
     private void mouseDragged(MouseEvent event){
-        if(!event.isPrimaryButtonDown() || event.isSecondaryButtonDown() || _status != MainWindowStatus.Edit) return;
+        if(!event.isPrimaryButtonDown() || event.isSecondaryButtonDown() ||
+                switchButton.getValue() != WindowState.Edit || _editState != EditState.Select) return;
         _workflow.moveAllSelectedElementsBy(_dragStartingPoint.subtract(new Point2D(event.getX(), event.getY())));
         _dragStartingPoint = new Point2D(event.getX(), event.getY());
         _workflow.draw(myCanvas);
@@ -81,39 +105,57 @@ public class Controller {
     }
 
     @FXML
-    public void buttonEdit(MouseEvent event){
-        _status = MainWindowStatus.Edit;
-        unselectAllNetElements();
-    }
-
-    @FXML
-    public void buttonSimulate(ActionEvent actionEvent) {
-        _status = MainWindowStatus.Simulate;
-        _workflow.unselectAllNetElement();
-    }
-
-    @FXML
     public void buttonCreatePlace(MouseEvent mouseEvent) {
-        _status = MainWindowStatus.CreatePlace;
-        unselectAllNetElements();
+        switch(switchButton.getValue()){
+            case Edit:
+                _editState = EditState.CreatePlace;
+                unselectAllNetElements();
+                break;
+            case Simulation:
+                break;
+        }
     }
 
     @FXML
     public void buttonCreateTransition(MouseEvent mouseEvent) {
-        _status = MainWindowStatus.CreateTransition;
-        unselectAllNetElements();
+        switch(switchButton.getValue()){
+            case Edit:
+                _editState = EditState.CreateTransition;
+                unselectAllNetElements();
+                break;
+            case Simulation:
+                break;
+        }
+    }
+
+    @FXML
+    public void buttonSelect(MouseEvent event) {
+        switch(switchButton.getValue()){
+            case Edit:
+                _editState = EditState.Select;
+                unselectAllNetElements();
+                break;
+            case Simulation:
+                break;
+        }
     }
 
     @FXML
     public void buttonCreateConnection(MouseEvent event) {
-        _status = MainWindowStatus.CreateConnection;
-        _connectNodes.clear();
-        unselectAllNetElements();
+        switch(switchButton.getValue()){
+            case Edit:
+                _editState = EditState.CreateConnection;
+                _connectNodes.clear();
+                unselectAllNetElements();
+                break;
+            case Simulation:
+                break;
+        }
     }
     //endregion
 
     private void doubleClick(MouseEvent event){
-        switch (_status){
+        switch (switchButton.getValue()){
             case Edit:
                 renameNodeDialog(event);
                 break;
@@ -122,37 +164,36 @@ public class Controller {
 
     }
     private void singleClickPrimary(MouseEvent event){
-        switch (_status) {
+        switch(switchButton.getValue()){
             case Edit:
-                singleClickPrimaryEdit(event);
+                switch (_editState) {
+                    case Select:
+                        singleClickPrimarySelect(event);
+                        break;
+                    case CreatePlace:
+                        singleClickPrimaryCreatePlace(event);
+                        break;
+                    case CreateTransition:
+                        singleClickPrimaryCreateTransistion(event);
+                        break;
+                    case CreateConnection:
+                        singleClickPrimaryCreateConnection(event);
+                        break;
+                }
                 break;
-            case CreatePlace:
-                singleClickPrimaryCreatePlace(event);
-                break;
-            case CreateTransition:
-                singleClickPrimaryCreateTransistion(event);
-                break;
-            case CreateConnection:
-                singleClickPrimaryCreateConnection(event);
+            case Simulation:
+                _workflow.fireTransistion(new Point2D(event.getX(), event.getY()));
+                _workflow.draw(myCanvas);
                 break;
         }
+
     }
     private void singleClickSecondary(MouseEvent event){
-        switch (_status){
-            case Edit:
-                singleClickSecondaryEdit(event);
-                break;
-            case CreatePlace:
-                singleClickSecondaryCreatePlace(event);
-                break;
-            case CreateTransition:
-                singleClickSecondaryCreateTransistion(event);
-                break;
-        }
+
     }
 
 
-    private void singleClickPrimaryEdit(MouseEvent event){
+    private void singleClickPrimarySelect(MouseEvent event){
         _dragStartingPoint = new Point2D(event.getX(), event.getY());
         if(!event.isControlDown()) _workflow.unselectAllNetElement();
         NetElement n = _workflow.get(new Point2D(event.getX(), event.getY()));

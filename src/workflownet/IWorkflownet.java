@@ -47,11 +47,20 @@ public interface IWorkflownet extends IDrawable {
      */
     void triggerNetElement(int id);
 
+    void fireTransistion(Point2D p);
+
     void unselectAllNetElement();
 
     void deleteAllSelectedNetElements();
 
     void moveAllSelectedElementsBy(Point2D distance);
 
-    void clearAllTokens();
+    /**
+     * Setzt das Workflownetz in einen sicheren Anfangszustand.
+     * Wenn es sich dabei um ein Workflownetz handelt sollen folgende Operationen ausgeführt werden:
+     * -Makiere Anfangsstelle
+     * -Makiere Endstelle
+     * -Setze Start Token
+     */
+    void reset();
 }
