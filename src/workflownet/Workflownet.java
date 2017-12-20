@@ -1,15 +1,25 @@
 package workflownet;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class Workflownet implements IWorkflownet {
     private HashMap<Integer, Node> _nodeSet = new HashMap<>();
     private boolean _isWorkflownet = false;
+    private SimpleStringProperty _actionLog = new SimpleStringProperty();
+    private SimpleStringProperty _isWorkflonetMessage = new SimpleStringProperty();
+
+    public SimpleStringProperty actionLog() {
+        return _actionLog;
+    }
+
+    public SimpleStringProperty isWorkflowNetMessage() {
+        return _isWorkflonetMessage;
+    }
 
     @Override
     public int add(Node n) {
@@ -47,22 +57,30 @@ public class Workflownet implements IWorkflownet {
         NetElement e1 = get(srcId);
         NetElement e2 = get(destId);
 
+        String errorMsg;
         if (e1.getType() == NetElementType.Edge || e2.getType() == NetElementType.Edge) {
-            throw new IllegalArgumentException("Die Netzelemente können nicht miteinander verbunden werden, " +
-                    "da mindestens eines der Elemente eine Kante ist.");
+            errorMsg = "Die Netzelemente können nicht miteinander verbunden werden, " +
+                    "da mindestens eines der Elemente eine Kante ist.";
+            _actionLog.setValue(errorMsg);
+            throw new IllegalArgumentException(errorMsg);
         } else if (e1.getType() == e2.getType()) {
-            throw new IllegalArgumentException("Die Netzelemente können nicht miteinander verbunden werden, " +
-                    "da die beiden Knoten vom selben Typ sind.");
+            errorMsg = "Die Netzelemente können nicht miteinander verbunden werden, " +
+                    "da die beiden Knoten vom selben Typ sind.";
+            _actionLog.setValue(errorMsg);
+            throw new IllegalArgumentException(errorMsg);
         }
 
         ((Node) e1)._outgoingEdges.forEach(edge -> {
             if (edge.getDestination() != null) {
-                if (edge.getDestination().getId() == e2.getId())
+                if (edge.getDestination().getId() == e2.getId()) {
+                    _actionLog.setValue("Es besteht bereits eine Verbindung zu diesem Knoten");
                     throw new IllegalArgumentException("Es besteht bereits eine Verbindung zu diesem Knoten");
+                }
             }
         });
 
         //Knoten können miteinander verbunden werden.
+        _actionLog.setValue("Knoten mit id " + srcId + " wurde mit Knoten mit id " + destId + " verbunden.");
         ((Node) e1).connectNodeTo((Node) e2);
         checkIfWorkflownet();
     }
@@ -124,6 +142,11 @@ public class Workflownet implements IWorkflownet {
                 buffer.setPoint(buffer.getPoint().subtract(distance));
             }
         });
+    }
+
+    @Override
+    public boolean isWorkflowNet() {
+        return _isWorkflownet;
     }
 
     @Override
@@ -221,18 +244,23 @@ public class Workflownet implements IWorkflownet {
      * Sonst lösche alle Markierungen.
      */
     private void checkIfWorkflownet() {
+        _isWorkflonetMessage.setValue("");
+
         Place endPlace = checkIfEndPlaceExists();
         Place startPlace = checkIfStartPlaceExists();
         boolean directedPath = checkIfDirectedPathExists();
+
         if(endPlace != null && startPlace != null && directedPath){
             //Petrinetz ist ein Workflownetz. Setze Workflowspezifische Eigenschaften.
             endPlace.setEndPlace(true);
             startPlace.setStartPlace(true);
             startPlace.setToken(true);
+            _isWorkflownet = true;
         }
         else{
             //Workflownnetz besitzt nicht die Eigenschaften eines Workflownetzes
             setNoWorkflowNetPropertys();
+            _isWorkflownet = false;
         }
     }
     private void setNoWorkflowNetPropertys(){
@@ -258,7 +286,10 @@ public class Workflownet implements IWorkflownet {
             }
         });
         if(buffer.size() == 1) return buffer.get(0);
-        else return null;
+        else{
+            _isWorkflonetMessage.setValue(_isWorkflonetMessage.getValue() + "\nPetrinetz ist kein Workflownetz: Keine Endstelle vorhanden.");
+            return null;
+        }
     }
     private Place checkIfStartPlaceExists(){
         ArrayList<Place> buffer = new ArrayList<>();
@@ -268,7 +299,10 @@ public class Workflownet implements IWorkflownet {
             }
         });
         if(buffer.size() == 1) return buffer.get(0);
-        else return null;
+        else{
+            _isWorkflonetMessage.setValue(_isWorkflonetMessage.getValue() + "\nPetrinetz ist kein Workflownetz: Keine Anfangstelle vorhanden.");
+            return null;
+        }
     }
     private boolean checkIfDirectedPathExists(){
         return true;

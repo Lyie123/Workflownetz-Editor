@@ -24,13 +24,13 @@
             <items>
                 <Button fx:id="button3" onAction="#buttonOpenFile">Öffne Workflownetz</Button>
                 <SwitchButton fx:id="switchButton"></SwitchButton>
-                <Button>button4</Button>
+                <Text fx:id="isWorkflownetMessage"></Text>
             </items>
         </ToolBar>
     </top>
     <bottom>
         <StackPane prefHeight="15">
-            <Text fx:id="statusMsg">213</Text>
+            <Text fx:id="actionLog"></Text>
         </StackPane>
     </bottom>
     <center>

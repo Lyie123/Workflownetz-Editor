@@ -55,6 +55,8 @@ public interface IWorkflownet extends IDrawable {
 
     void moveAllSelectedElementsBy(Point2D distance);
 
+    boolean isWorkflowNet();
+
     /**
      * Setzt das Workflownetz in einen sicheren Anfangszustand.
      * Wenn es sich dabei um ein Workflownetz handelt sollen folgende Operationen ausgeführt werden:

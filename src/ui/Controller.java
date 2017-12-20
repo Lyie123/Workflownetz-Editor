@@ -22,9 +22,11 @@ import java.util.Stack;
 
 public class Controller {
     @FXML
-    private Canvas myCanvas;
+    public Text isWorkflownetMessage;
     @FXML
-    private Text statusMsg;
+    private Text actionLog;
+    @FXML
+    private Canvas myCanvas;
     @FXML
     private SwitchButton switchButton;
 
@@ -38,6 +40,8 @@ public class Controller {
     private void initialize() {
         GraphicsContext gc =  myCanvas.getGraphicsContext2D();
         _workflow = new Workflownet();
+        actionLog.textProperty().bind(_workflow.actionLog());
+        isWorkflownetMessage.textProperty().bind(_workflow.isWorkflowNetMessage());
 
         //Tooltips festlegen
         switchButton.setTooltip(new Tooltip("OFF: Editmodus aktiv\tON: Simulationsmodus aktiv"));
@@ -68,6 +72,8 @@ public class Controller {
         if(selectedFile != null){
             pnml.MyParser p = new pnml.MyParser(selectedFile);
             _workflow = p.CreateWorkflow();
+            actionLog.textProperty().bind(_workflow.actionLog());
+            isWorkflownetMessage.textProperty().bind(_workflow.isWorkflowNetMessage());
             _workflow.draw(myCanvas);
         }
     }
@@ -243,7 +249,6 @@ public class Controller {
                     unselectAllNetElements();
                 }
                 catch (Exception e){
-                    statusMsg.setText(e.getMessage());
                     unselectAllNetElements();
                 }
 
