@@ -6,10 +6,16 @@ import javafx.scene.canvas.Canvas;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Stack;
 
 public class Workflownet implements IWorkflownet {
     private HashMap<Integer, Node> _nodeSet = new HashMap<>();
     private boolean _isWorkflownet = false;
+    private Place _startPlace = null;
+    private Place _endPlace = null;
+
+
     private SimpleStringProperty _actionLog = new SimpleStringProperty();
     private SimpleStringProperty _isWorkflonetMessage = new SimpleStringProperty();
 
@@ -225,6 +231,16 @@ public class Workflownet implements IWorkflownet {
         return netElements;
     }
 
+    private ArrayList<Node> getAllNodes(){
+        ArrayList<Node> buffer = new ArrayList<>();
+        _nodeSet.values().forEach(n -> {
+            if(n.getType() == NetElementType.Transition || n.getType() == NetElementType.Place){
+                buffer.add(n);
+            }
+        });
+        return buffer;
+    }
+
     /**
      * Gibt alle selektierten Netzelemente zurück
      *
@@ -245,16 +261,21 @@ public class Workflownet implements IWorkflownet {
      */
     private void checkIfWorkflownet() {
         _isWorkflonetMessage.setValue("");
+        _endPlace = null;
+        _startPlace = null;
 
-        Place endPlace = checkIfEndPlaceExists();
-        Place startPlace = checkIfStartPlaceExists();
+        _endPlace = checkIfEndPlaceExists();
+        _startPlace = checkIfStartPlaceExists();
+
+        //Prüfe ob jeder Knoten von der Eingangsstelle aus erreichbar ist.
+        //Prüfe ob jeder Knoten auf einem Pfad zur Endstelle liegt.
         boolean directedPath = checkIfDirectedPathExists();
 
-        if(endPlace != null && startPlace != null && directedPath){
+        if(_endPlace != null && _startPlace != null && directedPath){
             //Petrinetz ist ein Workflownetz. Setze Workflowspezifische Eigenschaften.
-            endPlace.setEndPlace(true);
-            startPlace.setStartPlace(true);
-            startPlace.setToken(true);
+            _endPlace.setEndPlace(true);
+            _startPlace.setStartPlace(true);
+            _startPlace.setToken(true);
             _isWorkflownet = true;
         }
         else{
@@ -286,8 +307,12 @@ public class Workflownet implements IWorkflownet {
             }
         });
         if(buffer.size() == 1) return buffer.get(0);
+        else if(buffer.size() == 0){
+            _isWorkflonetMessage.setValue(_isWorkflonetMessage.getValue() + "Petrinetz ist kein Workflownetz: Keine Endstelle vorhanden.\n");
+            return null;
+        }
         else{
-            _isWorkflonetMessage.setValue(_isWorkflonetMessage.getValue() + "\nPetrinetz ist kein Workflownetz: Keine Endstelle vorhanden.");
+            _isWorkflonetMessage.setValue(_isWorkflonetMessage.getValue() + "Petrinetz ist kein Workflownetz: Mehr als eine Endstelle vorhanden.\n");
             return null;
         }
     }
@@ -299,12 +324,61 @@ public class Workflownet implements IWorkflownet {
             }
         });
         if(buffer.size() == 1) return buffer.get(0);
+        else if(buffer.size() == 0){
+            _isWorkflonetMessage.setValue(_isWorkflonetMessage.getValue() + "Petrinetz ist kein Workflownetz: Keine Anfangstelle vorhanden.\n");
+            return null;
+        }
         else{
-            _isWorkflonetMessage.setValue(_isWorkflonetMessage.getValue() + "\nPetrinetz ist kein Workflownetz: Keine Anfangstelle vorhanden.");
+            _isWorkflonetMessage.setValue(_isWorkflonetMessage.getValue() + "Petrinetz ist kein Workflownetz: Mehr als eine Anfangstelle vorhanden.\n");
             return null;
         }
     }
     private boolean checkIfDirectedPathExists(){
-        return true;
+        if(_startPlace == null || _endPlace == null) return false;
+        ArrayList<Integer> buffer = new ArrayList<>();
+        getAllNodes().forEach(n -> buffer.add(n.getId()));
+        boolean isConnectedGraph = checkIfAllNodesGetVisited(_startPlace, buffer);
+        boolean everyNodeIsOnPathToEndPlace = true;
+
+        if(_endPlace != null && _startPlace != null){
+            for (Node n: getAllNodes()) {
+                HashSet<Integer> s = new HashSet<>();
+                if(!checkIfNodeIsReachable(n, _endPlace, s)){
+                    everyNodeIsOnPathToEndPlace = false;
+                    break;
+                }
+            }
+        }
+        else everyNodeIsOnPathToEndPlace = false;
+
+        if(isConnectedGraph && everyNodeIsOnPathToEndPlace) return true;
+        if(!isConnectedGraph) _isWorkflonetMessage.setValue(_isWorkflonetMessage.getValue() + "Nicht alle Knoten sind von der Anfangsstelle erreichbar.\n");
+        if(!everyNodeIsOnPathToEndPlace) _isWorkflonetMessage.setValue(_isWorkflonetMessage.getValue() + "Nicht jeder Knoten liegt auf einem Pfad zur Endstelle.\n");
+        return false;
+    }
+
+    private boolean checkIfAllNodesGetVisited(Node n, ArrayList<Integer> notVisitedNodes){
+        if(!notVisitedNodes.contains(n.getId())) return true;
+        notVisitedNodes.removeIf(e -> e == n.getId());
+        if(notVisitedNodes.size() == 0) return true;
+        Stack<Node> stack = new Stack<>();
+        n._outgoingEdges.forEach(e -> stack.push(e.getDestination()));
+        while((!stack.empty())){
+            checkIfAllNodesGetVisited(stack.pop(), notVisitedNodes);
+        }
+        if(notVisitedNodes.size() == 0) return true;
+        return false;
+    }
+    private boolean checkIfNodeIsReachable(Node n, Node dest, HashSet<Integer> visitedNodes){
+        if(visitedNodes.contains(n.getId())) return false;
+        else visitedNodes.add(n.getId());
+
+        if(n.getId() == dest.getId()) return true;
+        Stack<Node> stack = new Stack<>();
+        n._outgoingEdges.forEach(e -> stack.push(e.getDestination()));
+        while(!stack.empty()){
+            if(checkIfNodeIsReachable(stack.pop(), dest, visitedNodes)) return true;
+        }
+        return false;
     }
 }
