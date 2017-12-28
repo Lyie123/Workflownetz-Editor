@@ -12,9 +12,8 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("MainWindow.fxml"));
         primaryStage.setTitle("4517610_moch_rene");
-        primaryStage.setMaxHeight(1080);
-        primaryStage.setMaxWidth(1920);
-        primaryStage.setScene(new Scene(root, 1920, 1080));
+        primaryStage.setScene(new Scene(root));
+        primaryStage.getScene().getStylesheets().add("ui/Styles.css");
         primaryStage.show();
     }
 

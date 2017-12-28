@@ -2,38 +2,55 @@
 
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.text.Text?>
-
 <?import ui.SwitchButton?>
+
+<?import javafx.scene.layout.VBox?>
 <BorderPane onKeyPressed="#keyPressed" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.Controller">
     <left>
-        <ToolBar orientation="VERTICAL" prefWidth="150">
-            <items>
-                <Button onMouseClicked="#buttonSelect">Bearbeiten</Button>
-                <Button onMouseClicked="#buttonCreateTransition">Transistion</Button>
-                <Button onMouseClicked="#buttonCreatePlace">Stelle</Button>
-                <Button onMouseClicked="#buttonCreateConnection">Kante</Button>
-            </items>
-        </ToolBar>
+        <ToolBar orientation="VERTICAL" prefWidth="25" />
     </left>
+    <right>
+        <ToolBar orientation="VERTICAL" prefWidth="25" />
+    </right>
     <top>
-        <ToolBar orientation="HORIZONTAL" prefHeight="75">
+        <ToolBar orientation="HORIZONTAL" prefHeight="50">
             <items>
-                <Button fx:id="button3" onAction="#buttonOpenFile">Öffne Workflownetz</Button>
-                <SwitchButton fx:id="switchButton"></SwitchButton>
-                <Text fx:id="isWorkflownetMessage"></Text>
+                <Pane prefWidth="15" />
+                <Button fx:id="button3" onAction="#buttonOpenFile" prefHeight="50">Open</Button>
+                <Button prefHeight="50">Save</Button>
+                <Label fx:id="isWorkflownetMessage" />
+                <Pane prefWidth="400" />
+                <Button fx:id="b1" onMouseClicked="#buttonSelect" prefHeight="50" prefWidth="130">Edit</Button>
+                <Button fx:id="b2" onMouseClicked="#buttonCreateTransition" prefHeight="50" prefWidth="130">Transistion</Button>
+                <Button fx:id="b3" onMouseClicked="#buttonCreatePlace" prefHeight="50" prefWidth="130">Place</Button>
+                <Button fx:id="b4" onMouseClicked="#buttonCreateConnection" prefHeight="50" prefWidth="130">Edge</Button>
+                <Pane HBox.hgrow="ALWAYS" />
+                <SwitchButton fx:id="switchButton" />
+                <Pane prefWidth="15" />
             </items>
         </ToolBar>
     </top>
     <bottom>
-        <StackPane prefHeight="15">
-            <Text fx:id="actionLog"></Text>
-        </StackPane>
+        <HBox prefHeight="15" style="-fx-background-color: rgba(33, 31, 32, 0.82);">
+            <Label >Mouse Position: x: </Label>
+            <Label fx:id="mouseX" />
+            <Label>y: </Label>
+            <Label fx:id="mouseY" />
+            <Label fx:id="actionLog" textAlignment="CENTER" />
+        </HBox>
     </bottom>
     <center>
-        <Canvas fx:id="myCanvas" height="940" onMouseDragged="#mouseDragged" onMousePressed="#clickOnCanvas" width="1770" BorderPane.alignment="TOP_LEFT" />
+        <ScrollPane fx:id="scrollPane" pannable="true">
+            <content>
+                <Canvas onScroll="#test" fx:id="myCanvas" height="4000" onMouseDragged="#mouseDragged" onMouseMoved="#mouseMovedOnCanvas" onMousePressed="#clickOnCanvas" width="4000" BorderPane.alignment="TOP_LEFT" />
+            </content>
+        </ScrollPane>
     </center>
 </BorderPane>

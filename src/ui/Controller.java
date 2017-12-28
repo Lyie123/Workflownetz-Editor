@@ -2,31 +2,50 @@ package ui;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.text.Text;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import workflownet.*;
-
 import java.io.File;
 import java.util.Optional;
 import java.util.Stack;
 
 public class Controller {
     @FXML
-    public Text isWorkflownetMessage;
+    private ScrollPane scrollPane;
     @FXML
-    private Text actionLog;
+    private Label mouseX;
+    @FXML
+    private Label mouseY;
+    @FXML
+    private Label messageImage;
+    @FXML
+    private Button b1;
+    @FXML
+    private Button b2;
+    @FXML
+    private Button b3;
+    @FXML
+    private Button b4;
+    @FXML
+    private Label isWorkflownetMessage;
+    @FXML
+    private Label actionLog;
     @FXML
     private Canvas myCanvas;
+    @FXML
+    private ToolBar toolBar;
     @FXML
     private SwitchButton switchButton;
 
@@ -61,6 +80,19 @@ public class Controller {
                 _workflow.draw(myCanvas);
             }
         });
+
+        b1.visibleProperty().bind(switchButton.switchOnProperty().not());
+        b2.visibleProperty().bind(switchButton.switchOnProperty().not());
+        b3.visibleProperty().bind(switchButton.switchOnProperty().not());
+        b4.visibleProperty().bind(switchButton.switchOnProperty().not());
+
+        switchButton.disableProperty().bind(_workflow.isWorkflownetProperty().not());
+    }
+
+    @FXML
+    public void mouseMovedOnCanvas(MouseEvent event){
+        mouseX.setText(String.valueOf(event.getX()));
+        mouseY.setText(String.valueOf(event.getY()));
     }
 
     @FXML
@@ -74,6 +106,7 @@ public class Controller {
             _workflow = p.CreateWorkflow();
             actionLog.textProperty().bind(_workflow.actionLog());
             isWorkflownetMessage.textProperty().bind(_workflow.isWorkflowNetMessage());
+            switchButton.disableProperty().bind(_workflow.isWorkflownetProperty().not());
             _workflow.draw(myCanvas);
         }
     }
@@ -143,6 +176,21 @@ public class Controller {
                 break;
             case Simulation:
                 break;
+        }
+    }
+
+    @FXML
+    public void test(ScrollEvent event){
+        if(event.getDeltaY() < 0){
+            myCanvas.setScaleX(myCanvas.getScaleX() * 0.95);
+            myCanvas.setScaleY(myCanvas.getScaleY() * 0.95);
+            myCanvas.setWidth(20000);
+
+        }
+
+        else{
+            myCanvas.setScaleX(myCanvas.getScaleX() * 1.05);
+            myCanvas.setScaleY(myCanvas.getScaleY() * 1.05);
         }
     }
 

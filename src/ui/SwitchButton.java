@@ -38,13 +38,13 @@ public class SwitchButton extends Label
                 if (t1)
                 {
                     setText("ON");
-                    setStyle("-fx-background-color: green;-fx-text-fill:white;");
+                    setStyle("-fx-background-color: darkgreen;-fx-text-fill:white; -fx-border-color: white");
                     setContentDisplay(ContentDisplay.RIGHT);
                 }
                 else
                 {
                     setText("OFF");
-                    setStyle("-fx-background-color: grey;-fx-text-fill:black;");
+                    setStyle("-fx-background-color: whitesmoke;-fx-text-fill:black; -fx-border-color: white");
                     setContentDisplay(ContentDisplay.LEFT);
                 }
             }

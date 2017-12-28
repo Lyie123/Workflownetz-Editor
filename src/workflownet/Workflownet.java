@@ -1,5 +1,6 @@
 package workflownet;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
@@ -11,14 +12,13 @@ import java.util.Stack;
 
 public class Workflownet implements IWorkflownet {
     private HashMap<Integer, Node> _nodeSet = new HashMap<>();
-    private boolean _isWorkflownet = false;
+    private SimpleBooleanProperty _isWorkflownet = new SimpleBooleanProperty(false);
     private Place _startPlace = null;
     private Place _endPlace = null;
 
 
     private SimpleStringProperty _actionLog = new SimpleStringProperty();
     private SimpleStringProperty _isWorkflonetMessage = new SimpleStringProperty();
-
     public SimpleStringProperty actionLog() {
         return _actionLog;
     }
@@ -121,12 +121,9 @@ public class Workflownet implements IWorkflownet {
         NetElement netElement = get(p);
         if(netElement instanceof Transition){
             Transition t = (Transition) netElement;
-            if(t.isActive()){
-               //Entferne alle Token von vorherigen Stellen
-               t._incomingEdges.forEach(e -> ((Place)e.getSource()).setToken(false));
-               t._outgoingEdges.forEach(e -> ((Place)e.getDestination()).setToken(true));
-            }
+            t.fireTransition();
         }
+        checkIfSafeWorkflownet();
         return;
     }
 
@@ -152,6 +149,10 @@ public class Workflownet implements IWorkflownet {
 
     @Override
     public boolean isWorkflowNet() {
+        return _isWorkflownet.getValue();
+    }
+
+    public SimpleBooleanProperty isWorkflownetProperty() {
         return _isWorkflownet;
     }
 
@@ -165,6 +166,7 @@ public class Workflownet implements IWorkflownet {
             }
             else{
                 ((Transition)n).setActive(false);
+                ((Transition)n).checkForContact();
             }
         });
         checkIfWorkflownet();
@@ -240,6 +242,13 @@ public class Workflownet implements IWorkflownet {
         });
         return buffer;
     }
+    private ArrayList<Transition> getAllTransitions(){
+        ArrayList<Transition> buffer = new ArrayList<>();
+        getAllNodes().forEach(n ->{
+            if(n.getType() == NetElementType.Transition) buffer.add((Transition)n);
+        });
+        return buffer;
+    }
 
     /**
      * Gibt alle selektierten Netzelemente zurück
@@ -276,13 +285,37 @@ public class Workflownet implements IWorkflownet {
             _endPlace.setEndPlace(true);
             _startPlace.setStartPlace(true);
             _startPlace.setToken(true);
-            _isWorkflownet = true;
+            _isWorkflownet.setValue(true);
         }
         else{
             //Workflownnetz besitzt nicht die Eigenschaften eines Workflownetzes
             setNoWorkflowNetPropertys();
-            _isWorkflownet = false;
+            _isWorkflownet.setValue(false);
         }
+    }
+    private void checkIfSafeWorkflownet(){
+        ArrayList<Transition> transitions = getAllTransitions();
+        transitions.forEach(n -> n.checkForContact());
+
+        if(_endPlace.hasToken()){
+            isWorkflowNetMessage().setValue("\nDie Endstelle wurde erreicht!");
+        }
+
+        else{
+            boolean isDeadlock = true;
+            for(Transition t : transitions){
+                if(t.canFire()){
+                    isDeadlock = false;
+                    break;
+                }
+            }
+            if(isDeadlock){
+                _isWorkflonetMessage.setValue("");
+                _isWorkflonetMessage.setValue(_isWorkflonetMessage.getValue() + "\nDas Workflownetz befindet sich in einem Deadlock-Zustand.");
+            }
+        }
+
+
     }
     private void setNoWorkflowNetPropertys(){
         _nodeSet.values().forEach(n -> {
