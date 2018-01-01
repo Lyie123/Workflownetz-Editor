@@ -4,7 +4,6 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 
 public class Place extends Node {
     public Place(String label) {
@@ -37,13 +36,14 @@ public class Place extends Node {
     void setEndPlace(boolean endPlace){ _endPlace = endPlace; }
 
 
-    public static double Diameter = 50;
+    private static double _diameter = 50;
+    public static double getDiameter() { return _diameter*Scale; }
 
     @Override
     public void draw(Canvas canvas) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        drawLabel(canvas, Diameter, Diameter);
+        drawLabel(canvas, getDiameter(), getDiameter());
         drawPlace(gc);
         if(hasToken()) drawToken(gc);
 
@@ -51,7 +51,7 @@ public class Place extends Node {
 
     @Override
     public boolean PointLiesOnNetElement(Point2D p) {
-        double radius = Diameter/2;
+        double radius = getDiameter() /2;
         double xl = getPoint().getX() - p.getX();
         double yl = getPoint().getY() - p.getY();
         double length = Math.sqrt(Math.pow(xl, 2) + Math.pow(yl, 2));
@@ -65,12 +65,12 @@ public class Place extends Node {
         if(Selected) gc.setStroke(Color.RED);
 
         gc.setFill(Color.WHITE);
-        gc.fillOval(getPoint().getX() - Diameter/2, getPoint().getY() - Diameter/2,
-                Diameter, Diameter);
+        gc.fillOval(getPoint().getX() - getDiameter() /2, getPoint().getY() - getDiameter() /2,
+                getDiameter(), getDiameter());
 
-        gc.setLineWidth(StrokeThikness);
-        gc.strokeOval(getPoint().getX() - Diameter/2, getPoint().getY() - Diameter/2,
-                Diameter, Diameter);
+        gc.setLineWidth(getStrokeThikness());
+        gc.strokeOval(getPoint().getX() - getDiameter() /2, getPoint().getY() - getDiameter() /2,
+                getDiameter(), getDiameter());
 
         gc.setStroke(Color.BLACK);
     }
@@ -79,11 +79,11 @@ public class Place extends Node {
 
         gc.setFill(Color.BLACK);
         gc.setStroke(Color.BLACK);
-        gc.setLineWidth(StrokeThikness);
-        gc.strokeOval(getPoint().getX() - Diameter/ratio, getPoint().getY() - Diameter/ratio,
-                Diameter/(ratio/2), Diameter/(ratio/2));
-        gc.fillOval(getPoint().getX() - Diameter/ratio, getPoint().getY() - Diameter/ratio,
-                Diameter/(ratio/2), Diameter/(ratio/2));
+        gc.setLineWidth(getStrokeThikness());
+        gc.strokeOval(getPoint().getX() - getDiameter() /ratio, getPoint().getY() - getDiameter() /ratio,
+                getDiameter() /(ratio/2), getDiameter() /(ratio/2));
+        gc.fillOval(getPoint().getX() - getDiameter() /ratio, getPoint().getY() - getDiameter() /ratio,
+                getDiameter() /(ratio/2), getDiameter() /(ratio/2));
         gc.setFill(Color.WHITE);
     }
 }

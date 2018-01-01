@@ -2,13 +2,15 @@ package workflownet;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.event.Event;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
+import pnml.PNMLWriter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Stack;
+import javax.swing.event.EventListenerList;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.util.*;
 
 public class Workflownet implements IWorkflownet {
     private HashMap<Integer, Node> _nodeSet = new HashMap<>();
@@ -16,6 +18,18 @@ public class Workflownet implements IWorkflownet {
     private Place _startPlace = null;
     private Place _endPlace = null;
 
+    private final double maxScale = 1.8;
+    private final double minScale = 0.5;
+    private final double scaleTick = 0.1;
+
+    private ArrayList<Listener> _endPlaceReachedListener = new ArrayList<>();
+    public void registerEndPlaceReached(Listener l){
+        _endPlaceReachedListener.add(l);
+    }
+    private ArrayList<Listener> _deadLockListener = new ArrayList<>();
+    public void registerDeadLockOccured(Listener l){
+        _deadLockListener.add(l);
+    }
 
     private SimpleStringProperty _actionLog = new SimpleStringProperty();
     private SimpleStringProperty _isWorkflonetMessage = new SimpleStringProperty();
@@ -25,6 +39,55 @@ public class Workflownet implements IWorkflownet {
 
     public SimpleStringProperty isWorkflowNetMessage() {
         return _isWorkflonetMessage;
+    }
+
+    public void safe(File pnmlDatei) {
+        PNMLWriter pnmlWriter = new PNMLWriter(pnmlDatei);
+        pnmlWriter.startXMLDocument();
+
+        for (Node n : getAllNodes()) {
+            switch (n.getType()) {
+                case Transition:
+                    Transition t = (Transition) n;
+                    pnmlWriter.addTransition(String.valueOf(t.getId()), t.getLabel(),
+                            String.valueOf(Math.round(t.getPoint().getX())), String.valueOf(Math.round(t.getPoint().getY())));
+                    break;
+                case Place:
+                    Place p = (Place) n;
+                    String tokenString = p.hasToken() ? "1" : "0";
+                    pnmlWriter.addPlace(String.valueOf(p.getId()), p.getLabel(),
+                            String.valueOf(Math.round(p.getPoint().getX())), String.valueOf(Math.round(p.getPoint().getY())),
+                            tokenString);
+                    break;
+            }
+
+
+
+        }
+        for (Edge n : getAllEdges()) {
+            pnmlWriter.addArc(String.valueOf(n.getId()),
+                    String.valueOf(n.getSource().getId()),
+                    String.valueOf(n.getDestination().getId()));
+        }
+        pnmlWriter.finishXMLDocument();
+    }
+    public static Workflownet open(File path){
+        pnml.MyParser p = new pnml.MyParser(path);
+        Workflownet w = p.CreateWorkflow();
+        if(w.checkIfWorkflownet()){
+            ArrayList<Integer> tokenIds = p.getTokens();
+            if(tokenIds.size() > 0) {
+                w.getAllPlaces().forEach(n -> n.setToken(false));
+                p.getTokens().forEach(t -> {
+                    w.getAllPlaces().forEach(n -> {
+                        if (n.getId() == t) {
+                            n.setToken(true);
+                        }
+                    });
+                });
+            }
+        }
+        return w;
     }
 
     @Override
@@ -121,9 +184,9 @@ public class Workflownet implements IWorkflownet {
         NetElement netElement = get(p);
         if(netElement instanceof Transition){
             Transition t = (Transition) netElement;
-            t.fireTransition();
+            if(t.fireTransition()) checkIfSafeWorkflownet();
         }
-        checkIfSafeWorkflownet();
+
         return;
     }
 
@@ -143,6 +206,8 @@ public class Workflownet implements IWorkflownet {
             if (e.getType() != NetElementType.Edge) {
                 Node buffer = (Node) e;
                 buffer.setPoint(buffer.getPoint().subtract(distance));
+                if(buffer.getPoint().getX() < 0) buffer.setPoint(new Point2D(0, buffer.getPoint().getY()));
+                if(buffer.getPoint().getY() < 0) buffer.setPoint(new Point2D(buffer.getPoint().getX(), 0));
             }
         });
     }
@@ -179,6 +244,16 @@ public class Workflownet implements IWorkflownet {
             n.getOutgoingEdges().forEach(e -> e.draw(canvas));
             n.draw(canvas);
         });
+    }
+
+    public void scalePositive(){
+        if(maxScale <= NetElement.Scale) return;
+        NetElement.Scale+=scaleTick;
+    }
+
+    public void scaleNegative(){
+        if(minScale >= NetElement.Scale) return;
+        NetElement.Scale-=scaleTick;
     }
 
     /**
@@ -232,7 +307,6 @@ public class Workflownet implements IWorkflownet {
         });
         return netElements;
     }
-
     private ArrayList<Node> getAllNodes(){
         ArrayList<Node> buffer = new ArrayList<>();
         _nodeSet.values().forEach(n -> {
@@ -242,10 +316,24 @@ public class Workflownet implements IWorkflownet {
         });
         return buffer;
     }
+    private ArrayList<Edge> getAllEdges(){
+        ArrayList<Edge> buffer = new ArrayList<>();
+        getAllNetElements().forEach(n ->{
+            if(n.getType() == NetElementType.Edge) buffer.add((Edge) n);
+        });
+        return buffer;
+    }
     private ArrayList<Transition> getAllTransitions(){
         ArrayList<Transition> buffer = new ArrayList<>();
         getAllNodes().forEach(n ->{
             if(n.getType() == NetElementType.Transition) buffer.add((Transition)n);
+        });
+        return buffer;
+    }
+    private ArrayList<Place> getAllPlaces(){
+        ArrayList<Place> buffer = new ArrayList<>();
+        getAllNodes().forEach(n ->{
+            if(n.getType() == NetElementType.Place) buffer.add((Place)n);
         });
         return buffer;
     }
@@ -268,7 +356,7 @@ public class Workflownet implements IWorkflownet {
      * Falls ja setze Anfangsstelle, Endstelle und Anfangstoken.
      * Sonst lösche alle Markierungen.
      */
-    private void checkIfWorkflownet() {
+    private boolean checkIfWorkflownet() {
         _isWorkflonetMessage.setValue("");
         _endPlace = null;
         _startPlace = null;
@@ -286,19 +374,22 @@ public class Workflownet implements IWorkflownet {
             _startPlace.setStartPlace(true);
             _startPlace.setToken(true);
             _isWorkflownet.setValue(true);
+            return true;
         }
         else{
             //Workflownnetz besitzt nicht die Eigenschaften eines Workflownetzes
             setNoWorkflowNetPropertys();
             _isWorkflownet.setValue(false);
+            return false;
         }
     }
-    private void checkIfSafeWorkflownet(){
+    public void checkIfSafeWorkflownet(){
+        if(!isWorkflowNet()) return;
         ArrayList<Transition> transitions = getAllTransitions();
         transitions.forEach(n -> n.checkForContact());
 
-        if(_endPlace.hasToken()){
-            isWorkflowNetMessage().setValue("\nDie Endstelle wurde erreicht!");
+        if(checkIfEndMarkIsReached()){
+            _endPlaceReachedListener.forEach(n -> n.handle());
         }
 
         else{
@@ -310,8 +401,7 @@ public class Workflownet implements IWorkflownet {
                 }
             }
             if(isDeadlock){
-                _isWorkflonetMessage.setValue("");
-                _isWorkflonetMessage.setValue(_isWorkflonetMessage.getValue() + "\nDas Workflownetz befindet sich in einem Deadlock-Zustand.");
+                _deadLockListener.forEach(n -> n.handle());
             }
         }
 
@@ -388,6 +478,17 @@ public class Workflownet implements IWorkflownet {
         if(!isConnectedGraph) _isWorkflonetMessage.setValue(_isWorkflonetMessage.getValue() + "Nicht alle Knoten sind von der Anfangsstelle erreichbar.\n");
         if(!everyNodeIsOnPathToEndPlace) _isWorkflonetMessage.setValue(_isWorkflonetMessage.getValue() + "Nicht jeder Knoten liegt auf einem Pfad zur Endstelle.\n");
         return false;
+    }
+    private boolean checkIfEndMarkIsReached(){
+        for(Place p : getAllPlaces()){
+            if(p == _endPlace){
+                if(!p.hasToken()) return false;
+            }
+            else{
+                if(p.hasToken()) return false;
+            }
+        }
+        return true;
     }
 
     private boolean checkIfAllNodesGetVisited(Node n, ArrayList<Integer> notVisitedNodes){

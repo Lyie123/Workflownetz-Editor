@@ -2,34 +2,24 @@ package ui;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
-import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.Pane;
+import javafx.scene.input.*;
 import javafx.stage.FileChooser;
+import pnml.PNMLWriter;
 import workflownet.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.Stack;
 
 public class Controller {
     @FXML
-    private ScrollPane scrollPane;
-    @FXML
-    private Label mouseX;
-    @FXML
-    private Label mouseY;
-    @FXML
-    private Label messageImage;
+    private Label mousePosition;
     @FXML
     private Button b1;
     @FXML
@@ -39,13 +29,11 @@ public class Controller {
     @FXML
     private Button b4;
     @FXML
-    private Label isWorkflownetMessage;
+    private TextArea isWorkflownetMessage;
     @FXML
     private Label actionLog;
     @FXML
     private Canvas myCanvas;
-    @FXML
-    private ToolBar toolBar;
     @FXML
     private SwitchButton switchButton;
 
@@ -59,8 +47,6 @@ public class Controller {
     private void initialize() {
         GraphicsContext gc =  myCanvas.getGraphicsContext2D();
         _workflow = new Workflownet();
-        actionLog.textProperty().bind(_workflow.actionLog());
-        isWorkflownetMessage.textProperty().bind(_workflow.isWorkflowNetMessage());
 
         //Tooltips festlegen
         switchButton.setTooltip(new Tooltip("OFF: Editmodus aktiv\tON: Simulationsmodus aktiv"));
@@ -86,13 +72,32 @@ public class Controller {
         b3.visibleProperty().bind(switchButton.switchOnProperty().not());
         b4.visibleProperty().bind(switchButton.switchOnProperty().not());
 
-        switchButton.disableProperty().bind(_workflow.isWorkflownetProperty().not());
+        switchButton.switchOnProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
+                if(t1){
+                    _workflow.checkIfSafeWorkflownet();
+                }
+            }
+        });
+
+        setupWorkflownet();
+    }
+
+    @FXML
+    public void buttonScalePositive(ActionEvent event){
+        _workflow.scalePositive();
+        _workflow.draw(myCanvas);
+    }
+    @FXML
+    public void buttonScaleNegative(ActionEvent event){
+        _workflow.scaleNegative();
+        _workflow.draw(myCanvas);
     }
 
     @FXML
     public void mouseMovedOnCanvas(MouseEvent event){
-        mouseX.setText(String.valueOf(event.getX()));
-        mouseY.setText(String.valueOf(event.getY()));
+        mousePosition.setText("(" + String.valueOf(Math.round(event.getX())) + "/" + String.valueOf(Math.round(event.getY())) + ")");
     }
 
     @FXML
@@ -101,14 +106,34 @@ public class Controller {
         fileChooser.setTitle("Öffne Workflownetz");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNML Dateien", "*.pnml"));
         File selectedFile = fileChooser.showOpenDialog(myCanvas.getScene().getWindow());
-        if(selectedFile != null){
-            pnml.MyParser p = new pnml.MyParser(selectedFile);
-            _workflow = p.CreateWorkflow();
-            actionLog.textProperty().bind(_workflow.actionLog());
-            isWorkflownetMessage.textProperty().bind(_workflow.isWorkflowNetMessage());
-            switchButton.disableProperty().bind(_workflow.isWorkflownetProperty().not());
-            _workflow.draw(myCanvas);
+        try{
+            if(selectedFile != null){
+
+                _workflow = Workflownet.open(selectedFile);
+                setupWorkflownet();
+
+                if(_workflow.isWorkflowNet()){
+                    if(switchButton.switchOnProperty().getValue() == true) {
+                        _workflow.checkIfSafeWorkflownet();
+                    }
+                    else {
+                        switchButton.switchOnProperty().setValue(true);
+                    }
+                }
+                else{
+                    switchButton.switchOnProperty().set(false);
+                }
+            }
         }
+        catch (Exception e){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Fehler beim Parsen der pnml-Datei");
+            alert.setHeaderText("Die ausgewählte Datei ist nicht im PNML Format oder beschädigt.");
+
+            alert.showAndWait();
+
+        }
+
     }
 
     @FXML
@@ -121,6 +146,7 @@ public class Controller {
 
     @FXML
     private void mouseDragged(MouseEvent event){
+        if(!event.isSecondaryButtonDown()) event.consume();
         if(!event.isPrimaryButtonDown() || event.isSecondaryButtonDown() ||
                 switchButton.getValue() != WindowState.Edit || _editState != EditState.Select) return;
         _workflow.moveAllSelectedElementsBy(_dragStartingPoint.subtract(new Point2D(event.getX(), event.getY())));
@@ -130,6 +156,7 @@ public class Controller {
 
     @FXML
     public void clickOnCanvas(MouseEvent event){
+
         switch(event.getClickCount()){
             case 1:
                 if(event.isPrimaryButtonDown()) singleClickPrimary(event);
@@ -144,7 +171,7 @@ public class Controller {
     }
 
     @FXML
-    public void buttonCreatePlace(MouseEvent mouseEvent) {
+    public void buttonCreatePlace(ActionEvent mouseEvent) {
         switch(switchButton.getValue()){
             case Edit:
                 _editState = EditState.CreatePlace;
@@ -156,7 +183,7 @@ public class Controller {
     }
 
     @FXML
-    public void buttonCreateTransition(MouseEvent mouseEvent) {
+    public void buttonCreateTransition(ActionEvent mouseEvent) {
         switch(switchButton.getValue()){
             case Edit:
                 _editState = EditState.CreateTransition;
@@ -168,7 +195,7 @@ public class Controller {
     }
 
     @FXML
-    public void buttonSelect(MouseEvent event) {
+    public void buttonSelect(ActionEvent event) {
         switch(switchButton.getValue()){
             case Edit:
                 _editState = EditState.Select;
@@ -181,21 +208,11 @@ public class Controller {
 
     @FXML
     public void test(ScrollEvent event){
-        if(event.getDeltaY() < 0){
-            myCanvas.setScaleX(myCanvas.getScaleX() * 0.95);
-            myCanvas.setScaleY(myCanvas.getScaleY() * 0.95);
-            myCanvas.setWidth(20000);
-
-        }
-
-        else{
-            myCanvas.setScaleX(myCanvas.getScaleX() * 1.05);
-            myCanvas.setScaleY(myCanvas.getScaleY() * 1.05);
-        }
+        event.consume();
     }
 
     @FXML
-    public void buttonCreateConnection(MouseEvent event) {
+    public void buttonCreateConnection(ActionEvent event) {
         switch(switchButton.getValue()){
             case Edit:
                 _editState = EditState.CreateConnection;
@@ -209,6 +226,7 @@ public class Controller {
     //endregion
 
     private void doubleClick(MouseEvent event){
+        event.consume();
         switch (switchButton.getValue()){
             case Edit:
                 renameNodeDialog(event);
@@ -218,6 +236,7 @@ public class Controller {
 
     }
     private void singleClickPrimary(MouseEvent event){
+        event.consume();
         switch(switchButton.getValue()){
             case Edit:
                 switch (_editState) {
@@ -326,5 +345,58 @@ public class Controller {
     private void unselectAllNetElements(){
         _workflow.unselectAllNetElement();
         _workflow.draw(myCanvas);
+    }
+
+    private void setupWorkflownet(){
+        actionLog.textProperty().bind(_workflow.actionLog());
+        isWorkflownetMessage.textProperty().bind(_workflow.isWorkflowNetMessage());
+        switchButton.disableProperty().bind(_workflow.isWorkflownetProperty().not());
+
+        _workflow.registerEndPlaceReached(new Listener() {
+            @Override
+            public void handle() {
+                _workflow.draw(myCanvas);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Information");
+                alert.setHeaderText("Reguläre Endmakierung wurde erreicht!.");
+
+                alert.showAndWait();
+            }
+        });
+        _workflow.registerDeadLockOccured(new Listener() {
+            @Override
+            public void handle() {
+                _workflow.draw(myCanvas);
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Information");
+                alert.setHeaderText("Das Workflownetz befindet sich im Deadlock Zustand!");
+
+                alert.showAndWait();
+            }
+        });
+
+
+
+        _workflow.draw(myCanvas);
+    }
+
+    public void buttonSaveFile(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Speichere Workflownetz");
+        File file = fileChooser.showSaveDialog(myCanvas.getScene().getWindow());
+        if (file != null) {
+            try {
+                if(file.getName().contains(".")) {
+                    _workflow.safe(file);
+                }
+                else{
+                    _workflow.safe(new File(file.getPath() + ".pnml"));
+
+                }
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+
     }
 }

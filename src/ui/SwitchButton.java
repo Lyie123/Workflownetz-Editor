@@ -14,6 +14,7 @@ public class SwitchButton extends Label
 {
     private SimpleBooleanProperty switchedOn = new SimpleBooleanProperty(true);
 
+
     public SwitchButton()
     {
         Button switchBtn = new Button();

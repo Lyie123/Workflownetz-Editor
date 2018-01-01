@@ -21,14 +21,14 @@ public abstract class Node extends NetElement {
 
     protected void drawLabel(Canvas canvas, double height, double width){
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setLineWidth(StrokeThikness);
-        gc.setFont(new Font("Verdana", FontSize));
+        gc.setLineWidth(getStrokeThikness());
+        gc.setFont(new Font("Verdana", getFontSize()));
         gc.setFill(Color.BLACK);
 
         float textWidth = Toolkit.getToolkit().getFontLoader().computeStringWidth(getLabel(), gc.getFont());
 
         gc.fillText(getLabel(), getPoint().getX() - textWidth/2,
-                getPoint().getY() + height/2 + FontSize);
+                getPoint().getY() + height/2 + getFontSize());
     }
     public String getLabel() { return _label; }
     public void setLabel(String label) { _label = label; }
@@ -40,7 +40,8 @@ public abstract class Node extends NetElement {
         dest._incomingEdges.add(new Edge(this, dest));
     }
 
-    public double FontSize = 14;
+    private double _fontSize = 14;
+    public double getFontSize() { return _fontSize*Scale; }
 
     protected ArrayList<Edge> _outgoingEdges = new ArrayList<>();
     protected ArrayList<Edge> _incomingEdges = new ArrayList<>();

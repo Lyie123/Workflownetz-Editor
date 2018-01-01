@@ -8,7 +8,10 @@ public abstract class NetElement implements IDrawable{
         _id = _counter++;
     }
 
-    public static double StrokeThikness = 2.5;
+    private static double _strokeThikness = 2.5;
+    public static double getStrokeThikness() {return _strokeThikness*Scale; }
+
+    public static double Scale = 1;
 
     public int getId(){
         return _id;

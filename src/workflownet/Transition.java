@@ -19,20 +19,25 @@ public class Transition extends Node {
     public boolean isActive(){ return _active; }
     void setActive(boolean active){ _active = active; }
 
-    public static double Height = 50;
-    public static double Width = 50;
+    private static double _height = 50;
+    private static double _width = 50;
 
-    public void fireTransition(){
+    public static double getHeight() { return _height *Scale; }
+    public static double getWidth() { return _width *Scale; }
+
+    public boolean fireTransition(){
         if(isActive()){
             if(!checkForContact()){
                 this._incomingEdges.forEach(e -> ((Place)e.getSource()).setToken(false));
                 this._outgoingEdges.forEach(e -> ((Place)e.getDestination()).setToken(true));
+                return true;
             }
             else{
                 //Es liegt ein Contact vor
+                return false;
             }
         }
-        else return;
+        else return false;
     }
 
     boolean checkForContact(){
@@ -53,7 +58,7 @@ public class Transition extends Node {
     public void draw(Canvas canvas) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        drawLabel(canvas, Height, Width);
+        drawLabel(canvas, getHeight(), getWidth());
 
         if(isActive()){
             gc.setFill(Color.LIGHTGREEN);
@@ -62,19 +67,19 @@ public class Transition extends Node {
 
         if(Selected) gc.setStroke(Color.RED);
 
-        gc.fillRect(getPoint().getX() - Width/2, getPoint().getY() - Height/2,
-                Width, Height);
+        gc.fillRect(getPoint().getX() - getWidth() /2, getPoint().getY() - getHeight() /2,
+                getWidth(), getHeight());
 
-        gc.setLineWidth(StrokeThikness);
-        gc.strokeRect(getPoint().getX() - Width/2, getPoint().getY() - Height/2,
-                Width, Height);
+        gc.setLineWidth(getStrokeThikness());
+        gc.strokeRect(getPoint().getX() - getWidth() /2, getPoint().getY() - getHeight() /2,
+                getWidth(), getHeight());
 
         if(_contact){
             gc.setStroke(Color.BLACK);
-            gc.strokeLine(getPoint().getX() - Width/2, getPoint().getY() - Height/2,
-                    getPoint().getX() + Width/2, getPoint().getY() + Height/2);
-            gc.strokeLine(getPoint().getX() - Width/2, getPoint().getY() + Height/2,
-                    getPoint().getX() + Width/2, getPoint().getY() - Height/2);
+            gc.strokeLine(getPoint().getX() - getWidth() /2, getPoint().getY() - getHeight() /2,
+                    getPoint().getX() + getWidth() /2, getPoint().getY() + getHeight() /2);
+            gc.strokeLine(getPoint().getX() - getWidth() /2, getPoint().getY() + getHeight() /2,
+                    getPoint().getX() + getWidth() /2, getPoint().getY() - getHeight() /2);
         }
 
         gc.setStroke(Color.BLACK);
@@ -83,7 +88,7 @@ public class Transition extends Node {
 
     @Override
     public boolean PointLiesOnNetElement(Point2D p) {
-        return (getPoint().getX()  - Width/2 <= p.getX() &&  p.getX() <= getPoint().getX() + Width/2 &&
-                getPoint().getY() - Height/2 <= p.getY() && p.getY() <= getPoint().getY() + Height/2);
+        return (getPoint().getX()  - getWidth() /2 <= p.getX() &&  p.getX() <= getPoint().getX() + getWidth() /2 &&
+                getPoint().getY() - getHeight() /2 <= p.getY() && p.getY() <= getPoint().getY() + getHeight() /2);
     }
 }

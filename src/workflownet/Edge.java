@@ -41,19 +41,19 @@ public class Edge extends NetElement {
         double offset = 0;
         switch(getDestination().getType()){
             case Place:
-                offset = Place.Diameter/2;
+                offset = Place.getDiameter() /2;
                 break;
             case Transition:
                 double degree = Math.abs(Math.toDegrees(angle));
                 while (degree > 45){
                     degree-=90;
                 }
-                offset = (Transition.Width/2) / (Math.cos(Math.toRadians(degree)));
+                offset = (Transition.getWidth() /2) / (Math.cos(Math.toRadians(degree)));
                 break;
         }
 
         gc.strokeLine(0, 0, len - offset, 0);
-        gc.fillPolygon(new double[]{len - offset, len - arrSize - offset, len - arrSize - offset, len - offset}, new double[]{0, -arrSize, arrSize, 0},
+        gc.fillPolygon(new double[]{len - offset, len - arrSize*Scale - offset, len - arrSize*Scale - offset, len - offset}, new double[]{0, -arrSize*Scale, arrSize*Scale, 0},
                 4);
 
         gc.setTransform(new Affine());

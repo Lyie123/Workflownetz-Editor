@@ -7,6 +7,7 @@ import workflownet.Transition;
 import workflownet.Workflownet;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MyParser extends PNMLParser{
@@ -29,7 +30,9 @@ public class MyParser extends PNMLParser{
      */
     @Override
     public void setMarking(String id, String marking) {
-        //todo Marke setzen noch nicht implementiert
+        if(marking.matches("1")){
+            _tokenId.add(_idMap.get(id));
+        }
     }
 
     /**
@@ -90,12 +93,17 @@ public class MyParser extends PNMLParser{
         _idMap.put(id, _workflowNet.add(new Transition("")));
     }
 
+    public ArrayList<Integer> getTokens(){
+        return _tokenId;
+    }
+
     /**
      * @return Gibt das geparste Workflownetz zurück
      */
     public Workflownet CreateWorkflow(){
         _workflowNet = new Workflownet();
         _idMap = new HashMap<>();
+        _tokenId = new ArrayList<>();
         this.initParser();
         this.parse();
         return _workflowNet;
@@ -109,4 +117,5 @@ public class MyParser extends PNMLParser{
      * Mapped die Id in der Workflownetz Datei mit der Id des ersellten Workflownetzes.
      */
     private HashMap<String, Integer> _idMap;
+    private ArrayList<Integer> _tokenId;
 }

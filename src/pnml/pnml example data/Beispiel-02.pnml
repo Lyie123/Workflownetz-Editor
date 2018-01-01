@@ -8,27 +8,7 @@
 			<initialMarking>
 				<token>
 					<value>0</value>
-				</token>
-			</initialMarking>
-			<graphics>
-				<position x="259" y="208"/>
-			</graphics>
-		</place>
-		<place id="S4">
-			<name>
-				<value>S4</value>
-			</name>
-			<initialMarking>
-				<token>
-					<value>0</value>
-				</token>
-			</initialMarking>
-			<graphics>
-				<position x="333" y="245"/>
-			</graphics>
-		</place>
-		<place id="S1">
-			<name>
+
 				<value>S1</value>
 			</name>
 			<initialMarking>
@@ -58,7 +38,7 @@
 				<value>T4</value>
 			</name>
 			<graphics>
-				<position x="199" y="279"/>
+				<position x="19009" y="279000"/>
 			</graphics>
 		</transition>
 		<transition id="T1">

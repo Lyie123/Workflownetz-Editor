@@ -11,7 +11,7 @@
 				</token>
 			</initialMarking>
 			<graphics>
-				<position x="235" y="533"/>
+				<position x="-235" y="-533"/>
 			</graphics>
 		</place>
 		<place id="S4">
