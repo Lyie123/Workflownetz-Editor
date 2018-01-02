@@ -12,6 +12,9 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.*;
 
+/**
+ * test123
+ */
 public class Workflownet implements IWorkflownet {
     private HashMap<Integer, Node> _nodeSet = new HashMap<>();
     private SimpleBooleanProperty _isWorkflownet = new SimpleBooleanProperty(false);

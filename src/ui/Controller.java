@@ -9,6 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import pnml.PNMLWriter;
 import workflownet.*;
