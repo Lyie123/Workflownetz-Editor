@@ -32,9 +32,7 @@ public class Controller {
     @FXML
     private TextArea isWorkflownetMessage;
     @FXML
-    private Label actionLog;
-    @FXML
-    private Canvas myCanvas;
+    private Pane myCanvas;
     @FXML
     private SwitchButton switchButton;
 
@@ -46,7 +44,6 @@ public class Controller {
     //region Events
     @FXML
     private void initialize() {
-        GraphicsContext gc =  myCanvas.getGraphicsContext2D();
         _workflow = new Workflownet();
 
         //Tooltips festlegen
@@ -150,14 +147,13 @@ public class Controller {
         if(!event.isSecondaryButtonDown()) event.consume();
         if(!event.isPrimaryButtonDown() || event.isSecondaryButtonDown() ||
                 switchButton.getValue() != WindowState.Edit || _editState != EditState.Select) return;
-        _workflow.moveAllSelectedElementsBy(_dragStartingPoint.subtract(new Point2D(event.getX(), event.getY())));
-        _dragStartingPoint = new Point2D(event.getX(), event.getY());
+        _workflow.moveAllSelectedElementsBy(_dragStartingPoint.subtract(new Point2D(event.getSceneX(), event.getSceneY())));
+        _dragStartingPoint = new Point2D(event.getSceneX(), event.getSceneY());
         _workflow.draw(myCanvas);
     }
 
     @FXML
     public void clickOnCanvas(MouseEvent event){
-
         switch(event.getClickCount()){
             case 1:
                 if(event.isPrimaryButtonDown()) singleClickPrimary(event);
@@ -268,7 +264,7 @@ public class Controller {
 
 
     private void singleClickPrimarySelect(MouseEvent event){
-        _dragStartingPoint = new Point2D(event.getX(), event.getY());
+        _dragStartingPoint = new Point2D(event.getSceneX(), event.getSceneY());
         if(!event.isControlDown()) _workflow.unselectAllNetElement();
         NetElement n = _workflow.get(new Point2D(event.getX(), event.getY()));
         if(n != null){
@@ -349,7 +345,6 @@ public class Controller {
     }
 
     private void setupWorkflownet(){
-        actionLog.textProperty().bind(_workflow.actionLog());
         isWorkflownetMessage.textProperty().bind(_workflow.isWorkflowNetMessage());
         switchButton.disableProperty().bind(_workflow.isWorkflownetProperty().not());
 

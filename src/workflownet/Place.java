@@ -1,9 +1,9 @@
 package workflownet;
 
 import javafx.geometry.Point2D;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.*;
 
 public class Place extends Node {
     public Place(String label) {
@@ -40,12 +40,10 @@ public class Place extends Node {
     public static double getDiameter() { return _diameter*Scale; }
 
     @Override
-    public void draw(Canvas canvas) {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
+    public void draw(Pane canvas) {
         drawLabel(canvas, getDiameter(), getDiameter());
-        drawPlace(gc);
-        if(hasToken()) drawToken(gc);
+        drawPlace(canvas);
+        if(hasToken()) drawToken(canvas);
 
     }
 
@@ -58,32 +56,31 @@ public class Place extends Node {
         return radius >= length;
     }
 
-    private void drawPlace(GraphicsContext gc){
-        if(_startPlace) gc.setStroke(Color.PURPLE);
-        else if(_endPlace) gc.setStroke(Color.PURPLE);
+    private void drawPlace(Pane gc){
+        Circle c = new Circle(getPoint().getX(), getPoint().getY(),
+                getDiameter()/2, Color.WHITE);
+        c.setStrokeWidth(getStrokeThikness());
+        c.setOnMouseDragged(gc.getOnMouseDragged());
+        c.setOnMousePressed(gc.getOnMousePressed());
 
-        if(Selected) gc.setStroke(Color.RED);
+        if(_startPlace || _endPlace) c.setStroke(Color.GOLDENROD);
+        else c.setStroke(Color.BLACK);
 
-        gc.setFill(Color.WHITE);
-        gc.fillOval(getPoint().getX() - getDiameter() /2, getPoint().getY() - getDiameter() /2,
-                getDiameter(), getDiameter());
+        if(Selected) c.setStroke(Color.RED);
 
-        gc.setLineWidth(getStrokeThikness());
-        gc.strokeOval(getPoint().getX() - getDiameter() /2, getPoint().getY() - getDiameter() /2,
-                getDiameter(), getDiameter());
-
-        gc.setStroke(Color.BLACK);
+        gc.getChildren().add(c);
     }
-    private void drawToken(GraphicsContext gc){
-        double ratio = 12;
+    private void drawToken(Pane gc){
+        double ratio = 14;
 
-        gc.setFill(Color.BLACK);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(getStrokeThikness());
-        gc.strokeOval(getPoint().getX() - getDiameter() /ratio, getPoint().getY() - getDiameter() /ratio,
-                getDiameter() /(ratio/2), getDiameter() /(ratio/2));
-        gc.fillOval(getPoint().getX() - getDiameter() /ratio, getPoint().getY() - getDiameter() /ratio,
-                getDiameter() /(ratio/2), getDiameter() /(ratio/2));
-        gc.setFill(Color.WHITE);
+        Circle c = new Circle(getPoint().getX(), getPoint().getY(),
+                getDiameter()/(ratio), Color.BLACK);
+
+        c.setOnMouseDragged(gc.getOnMouseDragged());
+        c.setOnMousePressed(gc.getOnMousePressed());
+
+        c.setStroke(Color.BLACK);
+        c.setStrokeWidth(getStrokeThikness());
+        gc.getChildren().add(c);
     }
 }

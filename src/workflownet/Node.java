@@ -4,8 +4,10 @@ import com.sun.javafx.tk.Toolkit;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 
@@ -19,16 +21,15 @@ public abstract class Node extends NetElement {
         return _outgoingEdges;
     }
 
-    protected void drawLabel(Canvas canvas, double height, double width){
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setLineWidth(getStrokeThikness());
-        gc.setFont(new Font("Verdana", getFontSize()));
-        gc.setFill(Color.BLACK);
+    protected void drawLabel(Pane canvas, double height, double width){
+        Text t = new Text();
+        t.setText(getLabel());
+        t.setFont(new Font("Verdana", getFontSize()));
+        float textWidth = Toolkit.getToolkit().getFontLoader().computeStringWidth(getLabel(), t.getFont());
 
-        float textWidth = Toolkit.getToolkit().getFontLoader().computeStringWidth(getLabel(), gc.getFont());
-
-        gc.fillText(getLabel(), getPoint().getX() - textWidth/2,
-                getPoint().getY() + height/2 + getFontSize());
+        t.setX(getPoint().getX() - textWidth/2);
+        t.setY(getPoint().getY() + height/2 + getFontSize());
+        canvas.getChildren().add(t);
     }
     public String getLabel() { return _label; }
     public void setLabel(String label) { _label = label; }

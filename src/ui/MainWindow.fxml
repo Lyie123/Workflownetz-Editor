@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
@@ -24,17 +23,17 @@
         <ToolBar orientation="HORIZONTAL" prefHeight="50">
             <items>
                 <Pane prefWidth="15" />
-                <Button fx:id="buttonOpen" onAction="#buttonOpenFile" prefHeight="50">Open</Button>
-                <Button fx:id="buttonSave" onAction="#buttonSaveFile" prefHeight="50">Save</Button>
+                <Button fx:id="buttonOpen" onAction="#buttonOpenFile" prefHeight="50">Öffnen</Button>
+                <Button fx:id="buttonSave" onAction="#buttonSaveFile" prefHeight="50">Speichern</Button>
                 <Button onAction="#buttonScalePositive" prefHeight="50" prefWidth="50" style="-fx-font-size: 19">+</Button>
                 <Button onAction="#buttonScaleNegative" prefHeight="50" prefWidth="50" style="-fx-font-size: 28">-</Button>
                 <ScrollPane fitToWidth="true" prefHeight="50" prefWidth="500">
                     <TextArea fx:id="isWorkflownetMessage" editable="false"></TextArea>
                 </ScrollPane>
-                <Button fx:id="b1" onAction="#buttonSelect" prefHeight="50" prefWidth="130">Edit</Button>
+                <Button fx:id="b1" onAction="#buttonSelect" prefHeight="50" prefWidth="130">Editieren</Button>
                 <Button fx:id="b2" onAction="#buttonCreateTransition" prefHeight="50" prefWidth="130">Transistion</Button>
-                <Button fx:id="b3" onAction="#buttonCreatePlace" prefHeight="50" prefWidth="130">Place</Button>
-                <Button fx:id="b4" onAction="#buttonCreateConnection" prefHeight="50" prefWidth="130">Edge</Button>
+                <Button fx:id="b3" onAction="#buttonCreatePlace" prefHeight="50" prefWidth="130">Stelle</Button>
+                <Button fx:id="b4" onAction="#buttonCreateConnection" prefHeight="50" prefWidth="130">Kante</Button>
                 <Pane HBox.hgrow="ALWAYS" />
                 <SwitchButton fx:id="switchButton" />
                 <Pane prefWidth="15" />
@@ -45,13 +44,13 @@
         <HBox prefHeight="15" style="-fx-background-color: rgba(33, 31, 32, 0.82);">
             <Label fx:id="mousePosition" prefWidth="100"></Label>
             <VBox HBox.hgrow="ALWAYS"></VBox>
-            <Label fx:id="actionLog" textAlignment="CENTER" />
         </HBox>
+
     </bottom>
     <center>
         <ScrollPane fx:id="scrollPane" onScroll="#test" pannable="true">
             <content>
-                <Canvas fx:id="myCanvas" height="4000" onMouseDragged="#mouseDragged" onMouseMoved="#mouseMovedOnCanvas" onMousePressed="#clickOnCanvas" onScroll="#test" width="4000" BorderPane.alignment="TOP_LEFT" />
+                <Pane fx:id="myCanvas" minHeight="5000" minWidth="5000" onMouseDragged="#mouseDragged" onMouseMoved="#mouseMovedOnCanvas" onMousePressed="#clickOnCanvas" onScroll="#test" />
             </content>
         </ScrollPane>
     </center>

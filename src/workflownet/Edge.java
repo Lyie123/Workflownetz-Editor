@@ -1,9 +1,13 @@
 package workflownet;
 
 import javafx.geometry.Point2D;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Polygon;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 
@@ -18,13 +22,9 @@ public class Edge extends NetElement {
     public Node getDestination(){ return _dest; }
 
     @Override
-    public void draw(Canvas canvas) {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        if(Selected){
-            gc.setStroke(Color.RED);
-        }
+    public void draw(Pane canvas) {
+        Group g = new Group();
 
-        gc.setFill(Color.BLACK);
         int arrSize = 6;
 
         Point2D p1 = getSource().getPoint();
@@ -36,7 +36,8 @@ public class Edge extends NetElement {
 
         Transform transform = Transform.translate(p1.getX(), p1.getY());
         transform = transform.createConcatenation(Transform.rotate(Math.toDegrees(angle), 0, 0));
-        gc.setTransform(new Affine(transform));
+
+        g.getTransforms().add(new Affine(transform));
 
         double offset = 0;
         switch(getDestination().getType()){
@@ -52,13 +53,30 @@ public class Edge extends NetElement {
                 break;
         }
 
-        gc.strokeLine(0, 0, len - offset, 0);
-        gc.fillPolygon(new double[]{len - offset, len - arrSize*Scale - offset, len - arrSize*Scale - offset, len - offset}, new double[]{0, -arrSize*Scale, arrSize*Scale, 0},
-                4);
+        Polygon p = new Polygon();
+        p.getPoints().addAll(new Double[]{
+                len - offset, 0d,
+                len -arrSize*Scale - offset, -arrSize*Scale,
+                len -arrSize*Scale - offset, arrSize*Scale,
+                len - offset, 0d
+        });
+        p.setFill(Color.BLACK);
 
-        gc.setTransform(new Affine());
+        p.setStrokeWidth(Node.getStrokeThikness());
+        Line l = new Line(0, 0, len - offset, 0);
+        if(Selected){
+            l.setStroke(Color.RED);
+            p.setStroke(Color.RED);
+        }
+        else{
+            l.setStroke(Color.BLACK);
+            p.setStroke(Color.BLACK);
 
-        gc.setStroke(Color.BLACK);
+        }
+        l.setStrokeWidth(Node.getStrokeThikness());
+        g.getChildren().addAll(l, p);
+
+        canvas.getChildren().add(g);
     }
 
     @Override

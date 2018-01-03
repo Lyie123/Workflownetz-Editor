@@ -3,7 +3,12 @@ package workflownet;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
+
+import java.awt.event.MouseEvent;
 
 public class Transition extends Node {
     public Transition(String label) {
@@ -55,35 +60,38 @@ public class Transition extends Node {
     }
 
     @Override
-    public void draw(Canvas canvas) {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
+    public void draw(Pane canvas) {
         drawLabel(canvas, getHeight(), getWidth());
 
+        Rectangle r = new Rectangle(getWidth(), getHeight());
+        r.setX(getPoint().getX() - getWidth() /2);
+        r.setY( getPoint().getY() - getHeight() /2);
+        r.setStrokeWidth(getStrokeThikness());
+
+
+        r.setOnMouseDragged(canvas.getOnMouseDragged());
+        r.setOnMousePressed(canvas.getOnMousePressed());
+
+
         if(isActive()){
-            gc.setFill(Color.LIGHTGREEN);
+            r.setFill(Color.LIGHTGREEN);
         }
-        else gc.setFill(Color.WHITE);
+        else r.setFill(Color.WHITE);
 
-        if(Selected) gc.setStroke(Color.RED);
+        if(Selected) r.setStroke(Color.RED);
+        else r.setStroke(Color.BLACK);
 
-        gc.fillRect(getPoint().getX() - getWidth() /2, getPoint().getY() - getHeight() /2,
-                getWidth(), getHeight());
-
-        gc.setLineWidth(getStrokeThikness());
-        gc.strokeRect(getPoint().getX() - getWidth() /2, getPoint().getY() - getHeight() /2,
-                getWidth(), getHeight());
+        canvas.getChildren().add(r);
 
         if(_contact){
-            gc.setStroke(Color.BLACK);
-            gc.strokeLine(getPoint().getX() - getWidth() /2, getPoint().getY() - getHeight() /2,
+            Line l1 = new Line(getPoint().getX() - getWidth() /2, getPoint().getY() - getHeight() /2,
                     getPoint().getX() + getWidth() /2, getPoint().getY() + getHeight() /2);
-            gc.strokeLine(getPoint().getX() - getWidth() /2, getPoint().getY() + getHeight() /2,
+            Line l2 = new Line(getPoint().getX() - getWidth() /2, getPoint().getY() + getHeight() /2,
                     getPoint().getX() + getWidth() /2, getPoint().getY() - getHeight() /2);
+            l1.setStrokeWidth(Node.getStrokeThikness());
+            l2.setStrokeWidth(Node.getStrokeThikness());
+            canvas.getChildren().addAll(l1, l2);
         }
-
-        gc.setStroke(Color.BLACK);
-        gc.setFill(Color.WHITE);
     }
 
     @Override

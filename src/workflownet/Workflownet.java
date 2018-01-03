@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.event.Event;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.layout.Pane;
 import pnml.PNMLWriter;
 
 import javax.swing.event.EventListenerList;
@@ -95,6 +96,7 @@ public class Workflownet implements IWorkflownet {
 
     @Override
     public int add(Node n) {
+        _actionLog.setValue("Knoten mit id " + n.getId() + " wurde hinzgefügt.");
         _nodeSet.put(n.getId(), n);
         checkIfWorkflownet();
         return n.getId();
@@ -113,6 +115,7 @@ public class Workflownet implements IWorkflownet {
                 break;
         }
         checkIfWorkflownet();
+        _actionLog.setValue("Knoten mit der id " + id + " wurde entfernt.");
     }
 
     @Override
@@ -241,7 +244,7 @@ public class Workflownet implements IWorkflownet {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(Pane canvas) {
         clear(canvas);
         _nodeSet.values().forEach(n -> {
             n.getOutgoingEdges().forEach(e -> e.draw(canvas));
@@ -262,8 +265,8 @@ public class Workflownet implements IWorkflownet {
     /**
      * Löscht alle Shapes die auf die Canvas gezeichnet wurden
      */
-    private void clear(Canvas canvas) {
-        canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+    private void clear(Pane canvas) {
+        canvas.getChildren().clear();
     }
 
     /**
