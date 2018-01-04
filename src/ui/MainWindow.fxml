@@ -45,7 +45,6 @@
             <Label fx:id="mousePosition" prefWidth="100"></Label>
             <VBox HBox.hgrow="ALWAYS"></VBox>
         </HBox>
-
     </bottom>
     <center>
         <ScrollPane fx:id="scrollPane" onScroll="#test" pannable="true">

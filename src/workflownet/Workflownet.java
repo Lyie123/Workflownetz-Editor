@@ -177,7 +177,7 @@ public class Workflownet implements IWorkflownet {
     public void triggerNetElement(int id) {
         for (NetElement e : getAllNetElements()) {
             if (e.getId() == id) {
-                e.Selected = !e.Selected;
+                e.setSelected(!e.getSelected());
                 return;
             }
         }
@@ -198,7 +198,7 @@ public class Workflownet implements IWorkflownet {
 
     @Override
     public void unselectAllNetElement() {
-        getAllNetElements().forEach(e -> e.Selected = false);
+        getAllNetElements().forEach(e -> e.setSelected(false));
     }
 
     @Override
@@ -352,7 +352,7 @@ public class Workflownet implements IWorkflownet {
     private ArrayList<NetElement> getAllSelectedNetElements() {
         ArrayList<NetElement> buffer = new ArrayList<>();
         getAllNetElements().forEach(e -> {
-            if (e.Selected) buffer.add(e);
+            if (e.getSelected()) buffer.add(e);
         });
         return buffer;
     }
@@ -417,8 +417,8 @@ public class Workflownet implements IWorkflownet {
         _nodeSet.values().forEach(n -> {
             if(n instanceof Place){
                 Place p = (Place)n;
-                p._endPlace = false;
-                p._startPlace = false;
+                p.setStartPlace(false);
+                p.setEndPlace(false);
                 p.setToken(false);
             }
             else if(n instanceof Transition){

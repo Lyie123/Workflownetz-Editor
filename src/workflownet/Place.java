@@ -6,15 +6,34 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 
 public class Place extends Node {
+    /**Konstruktor der Klasse Place
+     * @param label legt das Label fest.
+     */
     public Place(String label) {
         super(NetElementType.Place, label);
     }
 
+    /**
+     * Legt fest ob die Stelle markiert ist oder nicht
+     */
     private boolean _token = false;
-    public boolean _startPlace = false;
-    public boolean _endPlace = false;
+    /**
+     * Legt fest ob die Stelle eine Startstelle ist
+     */
+    private boolean _startPlace = false;
+    /**
+     * Legt fest ob die Stelle eine Endstelle ist
+     */
+    private boolean _endPlace = false;
 
+    /**
+     * @return gibt true zurück wenn die Stelle markiert ist,
+     *         sonst false
+     */
     public boolean hasToken(){ return _token; }
+    /**Setzt die Stelle auf markiert (true) oder unmarkiert (false)
+     * @param token legt fest ob die Stelle markiert ist
+     */
     void setToken(boolean token) {
         _token = token;
         _outgoingEdges.forEach(n -> {
@@ -30,15 +49,37 @@ public class Place extends Node {
             t.setActive(isActive);
         });
     }
+    /**
+     * @return gibt true zurück wenn die Stelle eine Startstelle ist,
+     *         sonst false
+     */
     public boolean isStartPlace(){ return _startPlace; }
+    /**Legt fest ob die Stelle eine Startstelle ist (true) oder nicht (false)
+     * @param startPlace legt fest ob Stelle eine Startstelle ist
+     */
     void setStartPlace(boolean startPlace){ _startPlace = startPlace; }
+    /**
+     * @return gibt true zurück wenn die Stelle eine Endstelle ist,
+     *         sonst false
+     */
     public boolean isEndPlace(){ return _endPlace; }
+    /**Legt fest ob die Stelle eine Endstelle ist (true) oder nicht (false)
+     * @param endPlace legt fest ob Stelle eine Endstelle ist
+     */
     void setEndPlace(boolean endPlace){ _endPlace = endPlace; }
 
-
+    /**
+     * Legt den Durchmesser aller Stellen fest
+     */
     private static double _diameter = 50;
+    /**
+     * @return gibt den Durchmesser der Stelle in Abhängikeit des Skalierungsfaktors zurück
+     */
     public static double getDiameter() { return _diameter*Scale; }
 
+    /**Die Methode zeichnet die Stelle auf die Pane
+     * @param canvas Zeichenflaeche auf die gezeichnet werden soll.
+     */
     @Override
     public void draw(Pane canvas) {
         drawLabel(canvas, getDiameter(), getDiameter());
@@ -56,31 +97,45 @@ public class Place extends Node {
         return radius >= length;
     }
 
-    private void drawPlace(Pane gc){
+    /**Zeichnet die Stelle und das Label auf die Pane
+     * @param canvas Zeichenflaeche auf die gezeichnet werden soll
+     */
+    private void drawPlace(Pane canvas){
         Circle c = new Circle(getPoint().getX(), getPoint().getY(),
                 getDiameter()/2, Color.WHITE);
-        c.setStrokeWidth(getStrokeThikness());
-        c.setOnMouseDragged(gc.getOnMouseDragged());
-        c.setOnMousePressed(gc.getOnMousePressed());
 
-        if(_startPlace || _endPlace) c.setStroke(Color.GOLDENROD);
+        c.setStrokeWidth(getStrokeThickness());
+
+        //Leite Events an die Eventhandler der Zeichenflaeche weiter.
+        //Dies ist wichtig, da sonst keine Mausklicks/MausDragged nicht an die canvas weitergeben werden.
+        c.setOnMouseDragged(canvas.getOnMouseDragged());
+        c.setOnMousePressed(canvas.getOnMousePressed());
+
+        if(isStartPlace() || isEndPlace()) c.setStroke(Color.GOLDENROD);
         else c.setStroke(Color.BLACK);
 
-        if(Selected) c.setStroke(Color.RED);
+        if(getSelected()) c.setStroke(Color.RED);
 
-        gc.getChildren().add(c);
+        canvas.getChildren().add(c);
     }
-    private void drawToken(Pane gc){
+
+    /**Zeichnet die Markierung auf die Stelle
+     * @param canvas Zeichenflaeche auf die gezeichnet werden soll
+     */
+    private void drawToken(Pane canvas){
+        //legt das Verhältnis zwischen Durchmesser der Markierung und Durchmesser des Stelle fest
         double ratio = 14;
 
         Circle c = new Circle(getPoint().getX(), getPoint().getY(),
                 getDiameter()/(ratio), Color.BLACK);
 
-        c.setOnMouseDragged(gc.getOnMouseDragged());
-        c.setOnMousePressed(gc.getOnMousePressed());
+        //Leite Events an die Eventhandler der Zeichenflaeche weiter.
+        //Dies ist wichtig, da sonst keine Mausklicks/MausDragged nicht and die canvas weitergeben werden.
+        c.setOnMouseDragged(canvas.getOnMouseDragged());
+        c.setOnMousePressed(canvas.getOnMousePressed());
 
         c.setStroke(Color.BLACK);
-        c.setStrokeWidth(getStrokeThikness());
-        gc.getChildren().add(c);
+        c.setStrokeWidth(getStrokeThickness());
+        canvas.getChildren().add(c);
     }
 }

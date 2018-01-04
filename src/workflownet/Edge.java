@@ -2,8 +2,6 @@ package workflownet;
 
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -62,9 +60,9 @@ public class Edge extends NetElement {
         });
         p.setFill(Color.BLACK);
 
-        p.setStrokeWidth(Node.getStrokeThikness());
+        p.setStrokeWidth(Node.getStrokeThickness());
         Line l = new Line(0, 0, len - offset, 0);
-        if(Selected){
+        if(getSelected()){
             l.setStroke(Color.RED);
             p.setStroke(Color.RED);
         }
@@ -73,7 +71,7 @@ public class Edge extends NetElement {
             p.setStroke(Color.BLACK);
 
         }
-        l.setStrokeWidth(Node.getStrokeThikness());
+        l.setStrokeWidth(Node.getStrokeThickness());
         g.getChildren().addAll(l, p);
 
         canvas.getChildren().add(g);
