@@ -56,7 +56,7 @@ public abstract class NetElement implements IDrawable{
      * @return true wenn Netzelement selektiert ist,
      *         sonst false
      */
-    public boolean getSelected(){ return _selected; }
+    public boolean isSelected(){ return _selected; }
 
     /**
      * @param value legt fest ob das Netzelement selektiert wurde oder nicht.
@@ -76,7 +76,7 @@ public abstract class NetElement implements IDrawable{
      */
     private int _id;
     /**
-     * Laufvariable die sich nach jeder Erstellung eines Netzelements um 1 erhöht.
+     * Laufvariable die sich nach jeder Erstellung eines Netzelements um 1 erhoeht.
      * Dadurch wird sichergestellt das jede id nur einmal vergeben wird.
      */
     private static int _counter = 0;

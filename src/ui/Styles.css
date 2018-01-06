@@ -107,6 +107,10 @@
     -fx-background-insets: 0 0 0 0, 0, 1, 2;
 }
 
+.tooltip{
+    -fx-font-size: 18;
+}
+
 .button:hover {
     -fx-background-color: #3a3a3a;
 }

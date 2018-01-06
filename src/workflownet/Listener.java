@@ -1,7 +1,7 @@
 package workflownet;
 
 /**
- * Interface für einfaches Eventhandling
+ * Interface fuer einfaches Eventhandling
  */
 public interface Listener {
     /**

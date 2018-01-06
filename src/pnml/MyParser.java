@@ -79,7 +79,6 @@ public class MyParser extends PNMLParser{
      */
     @Override
     public void newArc(String id, String source, String target) {
-        //todo id von kante wird nicht abgespeichert
         _workflowNet.connect(_idMap.get(source), _idMap.get(target));
     }
 

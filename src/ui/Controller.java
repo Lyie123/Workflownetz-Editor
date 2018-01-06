@@ -5,16 +5,12 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
 import javafx.geometry.Point2D;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
-import pnml.PNMLWriter;
 import workflownet.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.Optional;
 import java.util.Stack;
 
@@ -22,13 +18,21 @@ public class Controller {
     @FXML
     private Label mousePosition;
     @FXML
-    private Button b1;
+    private Button buttonScalePositive;
     @FXML
-    private Button b2;
+    private Button buttonScaleNegative;
     @FXML
-    private Button b3;
+    private Button buttonOpen;
     @FXML
-    private Button b4;
+    private Button buttonSave;
+    @FXML
+    private Button buttonEdit;
+    @FXML
+    private Button buttonTransition;
+    @FXML
+    private Button buttonPlace;
+    @FXML
+    private Button buttonEdge;
     @FXML
     private TextArea isWorkflownetMessage;
     @FXML
@@ -45,9 +49,18 @@ public class Controller {
     @FXML
     private void initialize() {
         _workflow = new Workflownet();
+        buttonEdit.setStyle("-fx-border-color: orangered");
 
         //Tooltips festlegen
-        switchButton.setTooltip(new Tooltip("OFF: Editmodus aktiv\tON: Simulationsmodus aktiv"));
+        buttonScaleNegative.setTooltip(new Tooltip("Verkleinert alle Netzelemente"));
+        buttonScalePositive.setTooltip(new Tooltip("Vergrößert alle Netzelemente"));
+        buttonSave.setTooltip(new Tooltip("Speichert das aktuelle Workflownetz in eine PNML Datei"));
+        buttonOpen.setTooltip(new Tooltip("Ladet ein bestehendes Workflownetz aus einer PNML Datei"));
+        switchButton.setTooltip(new Tooltip("OFF: Editiermodus aktiv\tON: Simulationsmodus aktiv"));
+        buttonEdit.setTooltip(new Tooltip("Bestehende Netzelemente editieren"));
+        buttonPlace.setTooltip(new Tooltip("Einfügen einer Stelle das Workflownetz"));
+        buttonTransition.setTooltip(new Tooltip("Einfügen einer Transition in das Workflownetz"));
+        buttonEdge.setTooltip(new Tooltip("Verbindet zwei unterschiedliche Knoten miteinander"));
 
         switchButton.switchOnProperty().addListener(new ChangeListener<Boolean>() {
             @Override
@@ -65,10 +78,10 @@ public class Controller {
             }
         });
 
-        b1.visibleProperty().bind(switchButton.switchOnProperty().not());
-        b2.visibleProperty().bind(switchButton.switchOnProperty().not());
-        b3.visibleProperty().bind(switchButton.switchOnProperty().not());
-        b4.visibleProperty().bind(switchButton.switchOnProperty().not());
+        buttonEdit.visibleProperty().bind(switchButton.switchOnProperty().not());
+        buttonTransition.visibleProperty().bind(switchButton.switchOnProperty().not());
+        buttonPlace.visibleProperty().bind(switchButton.switchOnProperty().not());
+        buttonEdge.visibleProperty().bind(switchButton.switchOnProperty().not());
 
         switchButton.switchOnProperty().addListener(new ChangeListener<Boolean>() {
             @Override
@@ -173,6 +186,8 @@ public class Controller {
             case Edit:
                 _editState = EditState.CreatePlace;
                 unselectAllNetElements();
+                resetFrameColorOfEditButtons();
+                buttonPlace.setStyle("-fx-border-color: orangered");
                 break;
             case Simulation:
                 break;
@@ -185,6 +200,8 @@ public class Controller {
             case Edit:
                 _editState = EditState.CreateTransition;
                 unselectAllNetElements();
+                resetFrameColorOfEditButtons();
+                buttonTransition.setStyle("-fx-border-color: orangered");
                 break;
             case Simulation:
                 break;
@@ -197,6 +214,8 @@ public class Controller {
             case Edit:
                 _editState = EditState.Select;
                 unselectAllNetElements();
+                resetFrameColorOfEditButtons();
+                buttonEdit.setStyle("-fx-border-color: orangered");
                 break;
             case Simulation:
                 break;
@@ -215,6 +234,8 @@ public class Controller {
                 _editState = EditState.CreateConnection;
                 _connectNodes.clear();
                 unselectAllNetElements();
+                resetFrameColorOfEditButtons();
+                buttonEdge.setStyle("-fx-border-color: orangered");
                 break;
             case Simulation:
                 break;
@@ -374,6 +395,13 @@ public class Controller {
 
 
         _workflow.draw(myCanvas);
+    }
+
+    private void resetFrameColorOfEditButtons(){
+        buttonTransition.setStyle("-fx-border-color: white");
+        buttonPlace.setStyle("-fx-border-color: white");
+        buttonEdit.setStyle("-fx-border-color: white");
+        buttonEdge.setStyle("-fx-border-color: white");
     }
 
     public void buttonSaveFile(ActionEvent actionEvent) {

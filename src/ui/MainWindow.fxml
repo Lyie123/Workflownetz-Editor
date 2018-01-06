@@ -25,15 +25,15 @@
                 <Pane prefWidth="15" />
                 <Button fx:id="buttonOpen" onAction="#buttonOpenFile" prefHeight="50">Öffnen</Button>
                 <Button fx:id="buttonSave" onAction="#buttonSaveFile" prefHeight="50">Speichern</Button>
-                <Button onAction="#buttonScalePositive" prefHeight="50" prefWidth="50" style="-fx-font-size: 19">+</Button>
-                <Button onAction="#buttonScaleNegative" prefHeight="50" prefWidth="50" style="-fx-font-size: 28">-</Button>
+                <Button fx:id="buttonScalePositive" onAction="#buttonScalePositive" prefHeight="50" prefWidth="50" style="-fx-font-size: 19">+</Button>
+                <Button fx:id="buttonScaleNegative" onAction="#buttonScaleNegative" prefHeight="50" prefWidth="50" style="-fx-font-size: 28">-</Button>
                 <ScrollPane fitToWidth="true" prefHeight="50" prefWidth="500">
                     <TextArea fx:id="isWorkflownetMessage" editable="false"></TextArea>
                 </ScrollPane>
-                <Button fx:id="b1" onAction="#buttonSelect" prefHeight="50" prefWidth="130">Editieren</Button>
-                <Button fx:id="b2" onAction="#buttonCreateTransition" prefHeight="50" prefWidth="130">Transistion</Button>
-                <Button fx:id="b3" onAction="#buttonCreatePlace" prefHeight="50" prefWidth="130">Stelle</Button>
-                <Button fx:id="b4" onAction="#buttonCreateConnection" prefHeight="50" prefWidth="130">Kante</Button>
+                <Button fx:id="buttonEdit" onAction="#buttonSelect" prefHeight="50" prefWidth="130">Editieren</Button>
+                <Button fx:id="buttonTransition" onAction="#buttonCreateTransition" prefHeight="50" prefWidth="130">Transistion</Button>
+                <Button fx:id="buttonPlace" onAction="#buttonCreatePlace" prefHeight="50" prefWidth="130">Stelle</Button>
+                <Button fx:id="buttonEdge" onAction="#buttonCreateConnection" prefHeight="50" prefWidth="130">Kante</Button>
                 <Pane HBox.hgrow="ALWAYS" />
                 <SwitchButton fx:id="switchButton" />
                 <Pane prefWidth="15" />

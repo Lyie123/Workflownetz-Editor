@@ -5,9 +5,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 
+/**
+ * Diese Klasse repraesentiert eine Stelle in einem Workflownetz.
+ */
 public class Place extends Node {
     /**Konstruktor der Klasse Place
-     * @param label legt das Label fest.
+     * @param label legt den Text des Labels fest.
      */
     public Place(String label) {
         super(NetElementType.Place, label);
@@ -82,7 +85,7 @@ public class Place extends Node {
      */
     @Override
     public void draw(Pane canvas) {
-        drawLabel(canvas, getDiameter(), getDiameter());
+        drawLabel(canvas, getDiameter());
         drawPlace(canvas);
         if(hasToken()) drawToken(canvas);
 
@@ -114,7 +117,7 @@ public class Place extends Node {
         if(isStartPlace() || isEndPlace()) c.setStroke(Color.GOLDENROD);
         else c.setStroke(Color.BLACK);
 
-        if(getSelected()) c.setStroke(Color.RED);
+        if(isSelected()) c.setStroke(Color.RED);
 
         canvas.getChildren().add(c);
     }
