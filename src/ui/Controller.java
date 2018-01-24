@@ -14,38 +14,93 @@ import java.io.File;
 import java.util.Optional;
 import java.util.Stack;
 
+/**
+ * Die Klasse Controller nimmt die Benutzeraktionen der Benutzeroberflaeche entgegen, wertet
+ * diese aus und agiert demensprechend
+ */
 public class Controller {
+    /**
+     * Zeigt die Mausposition auf der GUI an
+     */
     @FXML
     private Label mousePosition;
+    /**
+     * Button der die Netzelemente vergroessert
+     */
     @FXML
     private Button buttonScalePositive;
+    /**
+     * Button der die Netzelemente verkleinert
+     */
     @FXML
     private Button buttonScaleNegative;
+    /**
+     * Button der den Öffne Dialog einleitet
+     */
     @FXML
     private Button buttonOpen;
+    /**
+     * Button der den Speicherdialog einleitet
+     */
     @FXML
     private Button buttonSave;
+    /**
+     * Editierbutton
+     */
     @FXML
     private Button buttonEdit;
+    /**
+     * Transition einfuegen Button
+     */
     @FXML
     private Button buttonTransition;
+    /**
+     * Stelle einfuegen Button
+     */
     @FXML
     private Button buttonPlace;
+    /**
+     * Kante einfuegen Button
+     */
     @FXML
     private Button buttonEdge;
+    /**
+     * Textfeld fuer den Grund warum das Netz kein Workflownetz ist
+     */
     @FXML
     private TextArea isWorkflownetMessage;
+    /**
+     * Zeichenflaeche auf die das Netz gezeichnet wird
+     */
     @FXML
     private Pane myCanvas;
+    /**
+     * Kippschalter fuer Simulations- und Editiermodus
+     */
     @FXML
     private SwitchButton switchButton;
 
+    /**
+     * Dies ist die Referenz auf das Workflownetzobjekt
+     */
     private Workflownet _workflow;
+    /**
+     * Speichert die Mausposition in der das Dragging der Maus gestartet wurde
+     */
     private Point2D _dragStartingPoint;
+    /**
+     * Speichert den Zustand in welchem sich der Editor im Editiermodus befindet
+     */
     private EditState _editState = EditState.Select;
+    /**
+     * Speichert die Knoten die miteinander verbunden werden sollen
+     */
     private Stack<Node> _connectNodes = new Stack<>();
 
     //region Events
+    /**
+     * Initialisiert Tooltips und Bindings wenn die Anwendung gestartet wird
+     */
     @FXML
     private void initialize() {
         _workflow = new Workflownet();
@@ -68,6 +123,8 @@ public class Controller {
                 if(t1){
                     //Simulationsmodus aktiviert
                     _workflow.unselectAllNetElement();
+                    _workflow.checkIfSafeWorkflownet();
+                    _workflow.draw(myCanvas);
                 }
                 else{
                     //Editmodus aktiviert
@@ -241,7 +298,7 @@ public class Controller {
                 break;
         }
     }
-    //endregion
+
 
     private void doubleClick(MouseEvent event){
         event.consume();
@@ -341,6 +398,9 @@ public class Controller {
         }
     }
 
+    /**Wird aufgerufen wenn das Label eines Knoten geaendert werden soll
+     * @param event
+     */
     private void renameNodeDialog(MouseEvent event){
         if(event.isSecondaryButtonDown()) return;
         _workflow.unselectAllNetElement();
@@ -360,11 +420,44 @@ public class Controller {
         }
     }
 
-    private void unselectAllNetElements(){
-        _workflow.unselectAllNetElement();
-        _workflow.draw(myCanvas);
+    /**Wird aufgerufen wenn das bestehende Workflownetz in eine PNML Datei gespeichert werden soll
+     * @param actionEvent
+     */
+    public void buttonSaveFile(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Speichere Workflownetz");
+        File file = fileChooser.showSaveDialog(myCanvas.getScene().getWindow());
+        if (file != null) {
+            try {
+                if(file.getName().contains(".")) {
+                    _workflow.safe(file);
+                }
+                else{
+                    _workflow.safe(new File(file.getPath() + ".pnml"));
+
+                }
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+
+    }
+    //endregion
+
+    /**
+     * Setzt die Rahmenfarbe der Buttons Editieren, Transition, Stelle und Kante zurueck
+     */
+    private void resetFrameColorOfEditButtons(){
+        buttonTransition.setStyle("-fx-border-color: white");
+        buttonPlace.setStyle("-fx-border-color: white");
+        buttonEdit.setStyle("-fx-border-color: white");
+        buttonEdge.setStyle("-fx-border-color: white");
     }
 
+    /**
+     * Wird benötigt wenn die Referenz auf ein neues Workflownetzobjekt zeigt.
+     * Führt Binding zwischen dem neuen Workflownetz und der Benutzeroberflaeche aus.
+     */
     private void setupWorkflownet(){
         isWorkflownetMessage.textProperty().bind(_workflow.isWorkflowNetMessage());
         switchButton.disableProperty().bind(_workflow.isWorkflownetProperty().not());
@@ -397,30 +490,13 @@ public class Controller {
         _workflow.draw(myCanvas);
     }
 
-    private void resetFrameColorOfEditButtons(){
-        buttonTransition.setStyle("-fx-border-color: white");
-        buttonPlace.setStyle("-fx-border-color: white");
-        buttonEdit.setStyle("-fx-border-color: white");
-        buttonEdge.setStyle("-fx-border-color: white");
+    /**
+     * Waehlt alle selektierten Netzelemente ab
+     */
+    private void unselectAllNetElements(){
+        _workflow.unselectAllNetElement();
+        _workflow.draw(myCanvas);
     }
 
-    public void buttonSaveFile(ActionEvent actionEvent) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Speichere Workflownetz");
-        File file = fileChooser.showSaveDialog(myCanvas.getScene().getWindow());
-        if (file != null) {
-            try {
-                if(file.getName().contains(".")) {
-                    _workflow.safe(file);
-                }
-                else{
-                    _workflow.safe(new File(file.getPath() + ".pnml"));
 
-                }
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
-
-    }
 }

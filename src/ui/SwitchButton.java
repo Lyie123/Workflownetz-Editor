@@ -10,8 +10,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 
+/**
+ * Einfach Kippschalter der zwischen zwei Positionen wechseln kann
+ */
 public class SwitchButton extends Label
 {
+    /**
+     * Property das angibt in welcher Stellung der Kippschalter sich gerade befindet
+     */
     private SimpleBooleanProperty switchedOn = new SimpleBooleanProperty(true);
 
 

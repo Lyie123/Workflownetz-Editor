@@ -92,11 +92,23 @@ public class Transition extends Node {
      */
     boolean checkForContact(){
         if(isActive()){
+            //Prüfe ob mindestens eine Ausgangsstelle eine Marke trägt
             for(Edge p : _outgoingEdges){
-                if(((Place)p.getDestination()).hasToken() == true &&
-                        p.getDestination().getId() != p.getSource().getId()){
-                    _contact = true;
-                    return true;
+                Place place = (Place)p.getDestination();
+                if(place.hasToken() == true){
+                    //Stelle trägt Marke.
+                    //Prüfe ob Ausgangsstelle nicht zugleich Eingangsstelle der Transition ist.
+                    //falls true liegt ein contact vor.
+                    boolean outgoingPlaceEqualsIncomingPlaceOfTransition = false;
+                    for(Edge e : place._outgoingEdges){
+                        if(e.getDestination().getId() == this.getId()){
+                            outgoingPlaceEqualsIncomingPlaceOfTransition = true;
+                        }
+                    }
+                    if(!outgoingPlaceEqualsIncomingPlaceOfTransition){
+                        _contact = true;
+                        return true;
+                    }
                 }
             }
         }

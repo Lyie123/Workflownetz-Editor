@@ -10,7 +10,7 @@ import java.io.File;
 import java.util.*;
 
 /**
- * Diese Klasse repraesentiert ein Workflownetz, welches aus Knoten besteht die über Kanten miteinander verbunden sind.
+ * Diese Klasse repraesentiert ein Workflownetz, welches aus Knoten besteht die ueber Kanten miteinander verbunden sind.
  */
 public class Workflownet implements IWorkflownet {
     /**
@@ -233,8 +233,8 @@ public class Workflownet implements IWorkflownet {
 
         //Überprüfe ob auf Kante geklickt wurde
         ArrayList<Edge> edges = getAllEdges();
-        for (Edge edge: edges) {
-            if(edge.PointLiesOnNetElement(p)) return edge;
+        for (int i = edges.size() - 1; i >= 0; --i) {
+            if (edges.get(i).PointLiesOnNetElement(p)) return edges.get(i);
         }
 
         //Es wurde kein Netzelement angeklickt

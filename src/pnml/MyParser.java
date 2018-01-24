@@ -10,6 +10,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * PNML Parser das aus PNML Dateien Workflownet Objekte erzeugt
+ */
 public class MyParser extends PNMLParser{
     /**
      * Dieser Konstruktor erstellt einen neuen Parser für PNML Dateien,
@@ -92,6 +95,9 @@ public class MyParser extends PNMLParser{
         _idMap.put(id, _workflowNet.add(new Transition("")));
     }
 
+    /**
+     * @return gibt alle id der Stellen zurueck die markiert sind
+     */
     public ArrayList<Integer> getTokens(){
         return _tokenId;
     }
@@ -116,5 +122,8 @@ public class MyParser extends PNMLParser{
      * Mapped die Id in der Workflownetz Datei mit der Id des ersellten Workflownetzes.
      */
     private HashMap<String, Integer> _idMap;
+    /**
+     * Speichert alle id der Stellen die markiert sind
+     */
     private ArrayList<Integer> _tokenId;
 }
