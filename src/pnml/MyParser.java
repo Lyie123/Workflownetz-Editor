@@ -6,6 +6,7 @@ import workflownet.Place;
 import workflownet.Transition;
 import workflownet.Workflownet;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,7 +106,7 @@ public class MyParser extends PNMLParser{
     /**
      * @return Gibt das geparste Workflownetz zurück
      */
-    public Workflownet CreateWorkflow(){
+    public Workflownet CreateWorkflow() throws XMLStreamException {
         _workflowNet = new Workflownet();
         _idMap = new HashMap<>();
         _tokenId = new ArrayList<>();

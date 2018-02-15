@@ -19,31 +19,6 @@ import javax.xml.stream.events.XMLEvent;
  * Diese Klasse implementiert die Grundlage für einen einfachen PNML Parser.
  */
 public class PNMLParser {
-
-    /**
-     * Mit dieser Main Methode kann der Parser zum Testen
-     * aufgerufen werden. Als erster und einziger Paramter muss
-     * dazu der Pfad zur PNML Datei angegeben werden.
-     * 
-     * @param args
-     *      Die Konsolen Parameter, mit denen das Programm aufgerufen wird.
-     */
-    public static void main(final String[] args) {
-        if (args.length > 0) {
-            File pnmlDatei = new File(args[0]);
-            if (pnmlDatei.exists()) {
-                PNMLParser pnmlParser = new PNMLParser(pnmlDatei);
-                pnmlParser.initParser();
-                pnmlParser.parse();
-            } else {
-                System.err.println("Die Datei " + pnmlDatei.getAbsolutePath()
-                        + " wurde nicht gefunden!");
-            }
-        } else {
-            System.out.println("Bitte eine Datei als Parameter angeben!");
-        }
-    }
-
     /**
      * Dies ist eine Referenz zum Java Datei Objekt.
      */
@@ -114,7 +89,7 @@ public class PNMLParser {
      * Diese Methode liest die XML Datei und delegiert die 
      * gefundenen XML Elemente an die entsprechenden Methoden.
      */
-    public final void parse() {
+    public final void parse() throws XMLStreamException {
         while (xmlParser.hasNext()) {
             try {
                 XMLEvent event = xmlParser.nextEvent();
@@ -148,9 +123,7 @@ public class PNMLParser {
                     default:
                 }
             } catch (XMLStreamException e) {
-                System.err.println("Fehler beim Parsen des PNML Dokuments. "
-                        + e.getMessage());
-                e.printStackTrace();
+                throw e;
             }
         }
     }

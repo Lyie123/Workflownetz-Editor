@@ -80,6 +80,7 @@ public class Controller {
     @FXML
     private SwitchButton switchButton;
 
+    private File _lastDirectoryOpened = null;
     /**
      * Dies ist die Referenz auf das Workflownetzobjekt
      */
@@ -140,14 +141,15 @@ public class Controller {
         buttonPlace.visibleProperty().bind(switchButton.switchOnProperty().not());
         buttonEdge.visibleProperty().bind(switchButton.switchOnProperty().not());
 
+        /*Überflüssig
         switchButton.switchOnProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
                 if(t1){
-                    _workflow.checkIfSafeWorkflownet();
+                    //_workflow.checkIfSafeWorkflownet();
                 }
             }
-        });
+        });*/
 
         setupWorkflownet();
     }
@@ -173,10 +175,11 @@ public class Controller {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Öffne Workflownetz");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNML Dateien", "*.pnml"));
+        if(_lastDirectoryOpened != null) fileChooser.setInitialDirectory(_lastDirectoryOpened);
         File selectedFile = fileChooser.showOpenDialog(myCanvas.getScene().getWindow());
         try{
             if(selectedFile != null){
-
+                _lastDirectoryOpened = selectedFile.getParentFile();
                 _workflow = Workflownet.open(selectedFile);
                 setupWorkflownet();
 
@@ -426,9 +429,12 @@ public class Controller {
     public void buttonSaveFile(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Speichere Workflownetz");
+        if(_lastDirectoryOpened != null) fileChooser.setInitialDirectory(_lastDirectoryOpened);
         File file = fileChooser.showSaveDialog(myCanvas.getScene().getWindow());
         if (file != null) {
             try {
+                _lastDirectoryOpened = file.getParentFile();
+
                 if(file.getName().contains(".")) {
                     _workflow.safe(file);
                 }

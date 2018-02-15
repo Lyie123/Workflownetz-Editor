@@ -6,6 +6,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
 import pnml.PNMLWriter;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.util.*;
 
@@ -134,7 +135,7 @@ public class Workflownet implements IWorkflownet {
      * @param file PNML File aus den ein Workflownetz erzeugt werden soll
      * @return gibt das Workflow Objekt das aus der pnml Datei erzeugt wurde zurück
      */
-    public static Workflownet open(File file){
+    public static Workflownet open(File file) throws XMLStreamException {
         pnml.MyParser p = new pnml.MyParser(file);
         Workflownet w = p.CreateWorkflow();
         if(w.checkIfWorkflownet()){
